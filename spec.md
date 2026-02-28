@@ -1,15 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Deploy the complete BharatSMM application as the live production version with all existing features intact.
+**Goal:** Update the Add Funds page to display the correct UPI ID with a copy button and replace the QR code image with the cropped PhonePe QR code.
 
 **Planned changes:**
-- Publish all frontend pages (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel) to production
-- Deploy the backend actor with all implemented functions (orders, balances, top-up requests, admin operations)
-- Ensure the Admin Panel is accessible only to the admin principal
-- Verify the dark navy/orange-red visual theme is consistently applied across all pages
-- Confirm the sidebar renders the BharatSMM logo and all navigation links including the conditional Admin Panel entry
-- Confirm the Add Funds page displays the UPI QR code and accepts deposits as low as ₹1
-- Confirm service price editing works from the Admin Panel's Service Prices tab
+- Display UPI ID `8825245372-l3c6@ibl` prominently in the Scan & Pay section with a "Copy UPI ID" button
+- Add instructional text telling users to pay via any UPI app (PhonePe, Google Pay, Paytm, etc.)
+- Replace the existing QR code image with the new cropped PhonePe QR code (`bharatsmm-phonepe-qr.dim_400x600.png`)
+- Add label "Scan with PhonePe or any UPI app" above the QR code
+- Show account holder name "Mr Sandeep Kumar" below the QR code
+- Style all new elements consistently with the existing dark navy/orange-red BharatSMM theme
 
-**User-visible outcome:** The BharatSMM app is live and accessible at its production URL, with all pages and backend functionality fully operational.
+**User-visible outcome:** Users on the Add Funds page can scan the PhonePe QR code or copy the UPI ID to make payments via any UPI app.

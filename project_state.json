@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 13,
   "summary": "SMM (Social Media Marketing) panel app named 'bharatsmm'. User wants an Admin Dashboard with admin access to approve pending top-up requests and manage orders.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Edit Images\n- Crop to just the QR code and account info area, removing the footer copyright text and extra whitespace, keeping the PhonePe logo header, 'ACCEPTED HERE' label, QR code, and 'Mr Sandeep Kumar' name (AccountQRCodeFino Payments Bank - 4703_LIGHT_THEME.png > bharatsmm-phonepe-qr.dim_400x600.png)",
   "existing_features": [
     {
       "id": "feature-build-a-multi-page-react-frontend-for-bharatsmm-with-the-following-pages-1-dashboard-account-balance-summary-recent-orders-count-quick-order-shortcut-2-new-order-service-category-selector-service-dropdown-with-price-min-max-info-link-input-quantity-input-order-total-calculator-submit-button-3-orders-paginated-table-of-past-orders-showing-id-service-name-link-quantity-status-badge-date-4-services-read-only-catalog-listing-all-available-services-grouped-by-category-with-pricing-5-add-funds-display-balance-and-a-form-to-request-a-top-up-amount-input-submit-6-profile-display-logged-in-user-principal",
@@ -101,6 +102,22 @@
         "REQ-18"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-add-funds-page-frontend-src-pages-addfunds-tsx-to-display-the-upi-id-8825245372-l3c6-ibl-prominently-in-the-scan-pay-section-show-it-as-a-copyable-text-field-or-highlighted-label-with-a-copy-upi-id-button-instructing-users-to-pay-to-this-upi-id-via-any-upi-app-phonepe-google-pay-paytm-etc",
+      "title": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to display the UPI ID '8825245372-l3c6@ibl' prominently in the 'Scan & Pay' section. Show it as a copyable text field or highlighted label with a 'Copy UPI ID' button, instructing users to pay to this UPI ID via any UPI app (PhonePe, Google Pay, Paytm, etc.).",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-existing-qr-code-image-on-the-add-funds-page-frontend-src-pages-addfunds-tsx-with-the-newly-generated-phonepe-qr-code-image-frontend-public-assets-generated-bharatsmm-phonepe-qr-dim-400x600-png-display-it-in-the-scan-pay-section-above-the-upi-id-with-a-label-scan-with-phonepe-or-any-upi-app-and-the-account-holder-name-mr-sandeep-kumar-shown-below-the-qr-code",
+      "title": "Replace the existing QR code image on the Add Funds page (`frontend/src/pages/AddFunds.tsx`) with the newly generated PhonePe QR code image (`frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png`). Display it in the 'Scan & Pay' section above the UPI ID, with a label 'Scan with PhonePe or any UPI app' and the account holder name 'Mr Sandeep Kumar' shown below the QR code.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -180,6 +197,12 @@
       "reqIds": [
         "REQ-14"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Update the Add Funds page to display the UPI ID '8825245372-l3c6@ibl' as the payment method, and provide instructions/location for uploading a custom QR code image for users to scan and pay.",
+      "reqIds": [],
       "status": "pending"
     }
   ],

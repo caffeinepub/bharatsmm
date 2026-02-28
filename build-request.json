@@ -1,44 +1,64 @@
 {
   "kind": "build_request",
-  "title": "Publish BharatSMM — Final Live Deployment",
+  "title": "Update Add Funds page with UPI ID and PhonePe QR code",
   "projectName": "BharatSMM",
-  "priority": "high",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-18",
-      "text": "Publish and deploy the complete BharatSMM application (all frontend pages, admin dashboard, backend actor, and all previously implemented features) as the live production version.",
-      "target": "both",
+      "id": "REQ-19",
+      "text": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to display the UPI ID '8825245372-l3c6@ibl' prominently in the 'Scan & Pay' section. Show it as a copyable text field or highlighted label with a 'Copy UPI ID' button, instructing users to pay to this UPI ID via any UPI app (PhonePe, Google Pay, Paytm, etc.).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-recent"
         ],
         "quotes": [
-          "लाइब कर दो सब कुछ हो गया"
+          "Use this UPI ID for the 'Add Funds' section: 8825245372-l3c6@ibl"
         ]
       },
       "acceptanceCriteria": [
-        "The app is deployed and accessible at its live URL.",
-        "All existing pages (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel) are reachable and functional.",
-        "The Admin Panel is accessible only to the admin principal.",
-        "The dark navy/orange-red visual theme is consistently applied across all pages.",
-        "The sidebar renders the BharatSMM logo and all navigation links including the conditional Admin Panel entry.",
-        "The Add Funds page shows the UPI QR code and accepts deposits as low as ₹1.",
-        "Service price editing works from the Admin Panel's Service Prices tab.",
-        "All backend functions (orders, balances, top-up requests, admin operations) are live and operational."
+        "UPI ID '8825245372-l3c6@ibl' is displayed visibly in the Add Funds page Scan & Pay section",
+        "A 'Copy UPI ID' button or similar affordance allows users to copy the UPI ID to clipboard",
+        "Instructional text tells users to pay using any UPI app to this UPI ID",
+        "The UPI ID display is styled consistently with the existing dark navy/orange-red BharatSMM theme"
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "text": "Replace the existing QR code image on the Add Funds page (`frontend/src/pages/AddFunds.tsx`) with the newly generated PhonePe QR code image (`frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png`). Display it in the 'Scan & Pay' section above the UPI ID, with a label 'Scan with PhonePe or any UPI app' and the account holder name 'Mr Sandeep Kumar' shown below the QR code.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Also, let me know where I can upload my QR Code image so users can scan and pay easily"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The PhonePe QR code image is displayed prominently in the Scan & Pay section of the Add Funds page",
+        "The label 'Scan with PhonePe or any UPI app' appears above or alongside the QR code",
+        "Account holder name 'Mr Sandeep Kumar' is shown beneath the QR code",
+        "The existing old QR code image reference is replaced with the new one",
+        "QR code section is styled consistently with the BharatSMM dark navy/orange-red theme"
       ]
     }
   ],
   "constraints": [
-    "Do not introduce any new features or UI changes — this is a clean publish of the current state.",
-    "Do not modify any immutable frontend paths (useInternetIdentity.ts, useActor.ts, main.tsx, components/ui)."
+    "UPI ID must be displayed exactly as provided: 8825245372-l3c6@ibl",
+    "Do not modify any files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "The new QR code image must be served as a static asset from frontend/public/assets/generated — do not route it through the backend"
   ],
   "nonGoals": [
-    "Adding new pages or features beyond what is already implemented.",
-    "Changing the visual theme or layout.",
-    "Modifying backend data models or adding new backend functions."
+    "Do not add any real-time payment verification or UPI payment gateway integration",
+    "Do not change the top-up request submission logic or backend validation",
+    "Do not modify the minimum deposit amount (already set to ₹1)",
+    "Do not change any other pages besides AddFunds.tsx"
   ],
   "imageRequirements": {
     "required": [],
-    "edits": []
+    "edits": [
+      "Crop to just the QR code and account info area, removing the footer copyright text and extra whitespace, keeping the PhonePe logo header, 'ACCEPTED HERE' label, QR code, and 'Mr Sandeep Kumar' name (AccountQRCodeFino Payments Bank - 4703_LIGHT_THEME.png > bharatsmm-phonepe-qr.dim_400x600.png)"
+    ]
   }
 }

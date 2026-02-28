@@ -10,7 +10,7 @@
   "frontend/src/pages/NewOrder.tsx": "New Order page with category filter, service selector, link/quantity inputs, real-time cost calculator, and order submission with balance check.",
   "frontend/src/pages/Orders.tsx": "Paginated, searchable orders table showing order ID, service, link, quantity, cost, status badge, and date.",
   "frontend/src/pages/Services.tsx": "Searchable, filterable service catalog grouped by social media category with price/1000, min/max, and order shortcut links.",
-  "frontend/src/pages/AddFunds.tsx": "Add Funds page with current balance, UPI QR code, preset amount buttons (₹5–₹1000), custom amount input with ₹1 minimum, and top-up request submission.",
+  "frontend/src/pages/AddFunds.tsx": "Add Funds page showing current balance, a PhonePe QR code (`bharatsmm-phonepe-qr.dim_400x600.png`) with account holder name \"Mr Sandeep Kumar\", a copyable UPI ID (`8825245372-l3c6@ibl`) with clipboard feedback, preset/custom amount buttons, and a top-up request submission form.",
   "frontend/src/pages/Profile.tsx": "Profile page with avatar, editable name/email form, and copyable Internet Identity principal ID.",
   "frontend/src/pages/LoginPage.tsx": "Full-screen login landing page with BharatSMM branding, feature highlights, Internet Identity login button, and caffeine.ai footer.",
   "frontend/src/App.tsx": "Main app with TanStack Router, QueryClient, ThemeProvider, and all routes (/, /dashboard, /new-order, /orders, /services, /add-funds, /profile, /admin); handles auth gating, loading state, and profile setup modal.",

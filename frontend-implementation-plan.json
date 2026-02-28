@@ -1,76 +1,40 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Publish BharatSMM — Final Live Deployment",
+  "title": "Update Add Funds page with UPI ID and PhonePe QR code",
   "requirements": [
     {
-      "id": "REQ-18",
-      "summary": "Deploy the complete BharatSMM application with all existing features as the live production version",
+      "id": "REQ-19",
+      "summary": "Display UPI ID '8825245372-l3c6@ibl' prominently in the Add Funds page Scan & Pay section with a copyable text field and 'Copy UPI ID' button",
       "acceptanceCriteria": [
-        "The app is deployed and accessible at its live URL.",
-        "All existing pages (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel) are reachable and functional.",
-        "The Admin Panel is accessible only to the admin principal.",
-        "The dark navy/orange-red visual theme is consistently applied across all pages.",
-        "The sidebar renders the BharatSMM logo and all navigation links including the conditional Admin Panel entry.",
-        "The Add Funds page shows the UPI QR code and accepts deposits as low as ₹1.",
-        "Service price editing works from the Admin Panel's Service Prices tab.",
-        "All backend functions (orders, balances, top-up requests, admin operations) are live and operational."
+        "UPI ID '8825245372-l3c6@ibl' is displayed visibly in the Add Funds page Scan & Pay section",
+        "A 'Copy UPI ID' button or similar affordance allows users to copy the UPI ID to clipboard",
+        "Instructional text tells users to pay using any UPI app to this UPI ID",
+        "The UPI ID display is styled consistently with the existing dark navy/orange-red BharatSMM theme"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Layout.tsx",
+          "path": "frontend/src/pages/AddFunds.tsx",
           "operation": "modify",
-          "description": "Verify the BharatSMM logo at frontend/public/assets/generated/bharatsmm-logo.dim_256x256.png is correctly referenced in the sidebar. Ensure the admin-only navigation link with ShieldCheck icon is conditionally rendered based on the isCallerAdmin query result. Confirm all navigation links (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel) are present and functional."
-        },
+          "description": "Add a UPI ID display section in the 'Scan & Pay' area showing '8825245372-l3c6@ibl' as a prominently displayed, copyable text field. Include a 'Copy UPI ID' button that copies the UPI ID to the user's clipboard when clicked, with visual feedback (e.g., a toast notification or button text change to 'Copied!'). Add instructional text above or near the UPI ID stating 'Pay to this UPI ID using any UPI app (PhonePe, Google Pay, Paytm, etc.)'. Style the UPI ID section using Tailwind classes consistent with the existing BharatSMM dark navy background and orange-red accent colors from the theme defined in frontend/src/index.css and frontend/tailwind.config.js."
+        }
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "summary": "Replace existing QR code with the newly generated PhonePe QR code image and display account holder name 'Mr Sandeep Kumar'",
+      "acceptanceCriteria": [
+        "The PhonePe QR code image is displayed prominently in the Scan & Pay section of the Add Funds page",
+        "The label 'Scan with PhonePe or any UPI app' appears above or alongside the QR code",
+        "Account holder name 'Mr Sandeep Kumar' is shown beneath the QR code",
+        "The existing old QR code image reference is replaced with the new one",
+        "QR code section is styled consistently with the BharatSMM dark navy/orange-red theme"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/pages/AddFunds.tsx",
           "operation": "modify",
-          "description": "Verify the UPI QR code image at frontend/public/assets/generated/bharatsmm-payment-qr.dim_400x400.png is correctly displayed. Ensure the minimum top-up amount of ₹1 is enforced in the validation logic and that the initiateTopUp mutation is working correctly with the backend."
-        },
-        {
-          "path": "frontend/src/pages/AdminDashboard.tsx",
-          "operation": "modify",
-          "description": "Verify admin access guard correctly uses the isCallerAdmin query to show AccessDeniedScreen for non-admin users. Ensure all three tabs (Service Prices, Order Status, User Balance) are functional with their respective mutation hooks (useUpdateServicePrice, useUpdateOrderStatus, useAddBalance). Confirm the component follows the authorization component's guidance for admin-only access control."
-        },
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Verify the user dashboard displays current balance using the useGetBalance query, total order count, and order status breakdown (pending, processing, completed). Ensure navigation shortcuts to New Order and Orders pages are working. Confirm the dark navy/orange-red theme is applied correctly."
-        },
-        {
-          "path": "frontend/src/pages/NewOrder.tsx",
-          "operation": "modify",
-          "description": "Verify service filtering by category works correctly using the useListServices query. Ensure order cost calculation using the orderCalculations utility is accurate. Confirm the usePlaceOrder mutation successfully submits orders and deducts the balance. Verify the dark navy/orange-red theme styling is consistent."
-        },
-        {
-          "path": "frontend/src/pages/Orders.tsx",
-          "operation": "modify",
-          "description": "Verify the paginated order history correctly displays orders using the useListOrdersByUser query. Ensure search filtering by service name, link, or order ID works properly. Confirm OrderStatusBadge components render correctly for all order statuses. Verify the theme is consistent with the rest of the application."
-        },
-        {
-          "path": "frontend/src/pages/Services.tsx",
-          "operation": "modify",
-          "description": "Verify the searchable, filterable service catalog correctly displays all services grouped by social media category using the useListServices query. Ensure each service card shows price per 1000, min/max order limits, and category badge. Confirm the dark navy/orange-red theme styling is applied."
-        },
-        {
-          "path": "frontend/src/pages/Profile.tsx",
-          "operation": "modify",
-          "description": "Verify the user profile page correctly displays and allows editing of name and email using useGetCallerUserProfile and useSaveCallerUserProfile hooks. Ensure the Internet Identity principal ID is shown with a functional copy button. Confirm the theme is consistent."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Verify TanStack Router is configured with all required routes (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel). Ensure authentication gating using the useInternetIdentity hook redirects unauthenticated users to the LoginPage. Confirm ProfileSetupModal is shown for new users based on the useGetCallerUserProfile query result. Verify the authorization component's guidance is followed for proper authentication flow."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Verify the OKLCH-based CSS custom properties for the dark navy/orange-red theme are correctly defined and applied globally. Ensure Tailwind CSS is properly imported and configured. Confirm the brand gradient and glass utility classes are available for use across all pages."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Verify the HTML shell has the correct title 'BharatSMM' and meta description for production deployment. Ensure the root div with id='root' is present for React mounting. Confirm all necessary meta tags for SEO and social sharing are included."
+          "description": "Replace the existing QR code image reference in the 'Scan & Pay' section with the newly generated PhonePe QR code located at frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png. Display the QR code image prominently above the UPI ID section (from REQ-19). Add a label 'Scan with PhonePe or any UPI app' immediately above or next to the QR code. Below the QR code, display the account holder name 'Mr Sandeep Kumar' in a readable font size. Ensure the QR code section uses Tailwind classes that align with the BharatSMM dark navy/orange-red theme. Remove any references to the old QR code image path."
         }
       ]
     }

@@ -1,77 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-28T03:14:19.432Z",
+  "generatedAt": "2026-02-28T10:50:41.544Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-18",
-        "summary": "Publish and deploy the complete BharatSMM application (all frontend pages, admin dashboard, backend actor, and all previously implemented features) as the live production version.",
+        "id": "REQ-19",
+        "summary": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to display the UPI ID '8825245372-l3c6@ibl' prominently in the 'Scan & Pay' section. Show it as a copyable text field or highlighted label with a 'Copy UPI ID' button, instructing users to pay to this UPI ID via any UPI app (PhonePe, Google Pay, Paytm, etc.).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/pages/AddFunds.tsx",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/pages/Dashboard.tsx",
-          "frontend/src/pages/NewOrder.tsx",
-          "frontend/src/pages/Orders.tsx",
-          "frontend/src/pages/Services.tsx",
-          "frontend/src/pages/Profile.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css",
-          "frontend/index.html"
+          "frontend/src/pages/AddFunds.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/pages/AddFunds.tsx",
-          "frontend/src/pages/AdminDashboard.tsx",
-          "frontend/src/pages/Dashboard.tsx",
-          "frontend/src/pages/NewOrder.tsx",
-          "frontend/src/pages/Orders.tsx",
-          "frontend/src/pages/Services.tsx",
-          "frontend/src/pages/Profile.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/index.css",
-          "frontend/index.html"
+          "frontend/src/pages/AddFunds.tsx"
+        ]
+      },
+      {
+        "id": "REQ-20",
+        "summary": "Replace the existing QR code image on the Add Funds page (`frontend/src/pages/AddFunds.tsx`) with the newly generated PhonePe QR code image (`frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png`). Display it in the 'Scan & Pay' section above the UPI ID, with a label 'Scan with PhonePe or any UPI app' and the account holder name 'Mr Sandeep Kumar' shown below the QR code.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/AddFunds.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/AddFunds.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/blob-storage/Mixin.mo",
-    "backend/blob-storage/Storage.mo",
-    "backend/main.mo",
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.html",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.ts",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/OrderStatusBadge.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
+    "frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png",
     "frontend/src/pages/AddFunds.tsx",
-    "frontend/src/pages/AdminDashboard.tsx",
-    "frontend/src/pages/Dashboard.tsx",
-    "frontend/src/pages/LoginPage.tsx",
-    "frontend/src/pages/NewOrder.tsx",
-    "frontend/src/pages/Orders.tsx",
-    "frontend/src/pages/Profile.tsx",
-    "frontend/src/pages/Services.tsx",
-    "frontend/src/utils/orderCalculations.ts",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

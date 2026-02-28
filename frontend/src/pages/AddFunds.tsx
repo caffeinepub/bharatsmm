@@ -4,15 +4,18 @@ import { formatBalance } from '../utils/orderCalculations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Wallet, Info, CheckCircle2 } from 'lucide-react';
+import { Loader2, Wallet, Info, CheckCircle2, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SMALL_PRESETS = [5, 10, 20, 50];
 const LARGE_PRESETS = [100, 200, 500, 1000];
 
+const UPI_ID = '8825245372-l3c6@ibl';
+
 export default function AddFunds() {
   const [amount, setAmount] = useState('');
   const [success, setSuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const { data: balance, isLoading: balanceLoading } = useGetBalance();
   const { mutateAsync: initiateTopUp, isPending } = useInitiateTopUp();
@@ -20,6 +23,17 @@ export default function AddFunds() {
   const handlePreset = (val: number) => {
     setAmount(val.toString());
     setSuccess(false);
+  };
+
+  const handleCopyUpi = async () => {
+    try {
+      await navigator.clipboard.writeText(UPI_ID);
+      setCopied(true);
+      toast.success('UPI ID copied to clipboard!');
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error('Failed to copy UPI ID');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,19 +78,59 @@ export default function AddFunds() {
 
       {/* QR Code Section */}
       <div className="glass-card rounded-xl p-6 border border-border/30 text-center space-y-4">
-        <h2 className="text-lg font-semibold font-display text-foreground">Scan & Pay via UPI</h2>
+        <h2 className="text-lg font-semibold font-display text-foreground">Scan &amp; Pay via UPI</h2>
+
+        <p className="text-sm font-medium text-brand">Scan with PhonePe or any UPI app</p>
+
+        {/* PhonePe QR Code */}
         <div className="flex justify-center">
           <div className="p-3 bg-white rounded-2xl shadow-lg inline-block">
             <img
-              src="/assets/generated/bharatsmm-payment-qr.dim_400x400.png"
-              alt="BharatSMM UPI QR Code"
-              className="w-48 h-48 object-contain"
+              src="/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png"
+              alt="PhonePe UPI QR Code – Mr Sandeep Kumar"
+              className="w-52 object-contain"
             />
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Scan the QR code with any UPI app (GPay, PhonePe, Paytm, etc.)
-        </p>
+
+        {/* Account Holder Name */}
+        <p className="text-sm font-semibold text-foreground tracking-wide">Mr Sandeep Kumar</p>
+
+        {/* UPI ID Display */}
+        <div className="mt-2 space-y-2">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+            Pay to this UPI ID using any UPI app (PhonePe, Google Pay, Paytm, etc.)
+          </p>
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-2 bg-muted/60 border border-border/40 rounded-lg px-4 py-2.5">
+              <span className="font-mono text-sm font-semibold text-foreground select-all">
+                {UPI_ID}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyUpi}
+              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all border ${
+                copied
+                  ? 'bg-green-500/20 text-green-400 border-green-500/40'
+                  : 'bg-brand/20 text-brand border-brand/40 hover:bg-brand/30'
+              }`}
+              title="Copy UPI ID"
+            >
+              {copied ? (
+                <>
+                  <Check size={15} />
+                  <span className="hidden sm:inline">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={15} />
+                  <span className="hidden sm:inline">Copy</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Info Banner */}
@@ -85,7 +139,7 @@ export default function AddFunds() {
         <div>
           <p className="font-medium mb-1">How it works</p>
           <ol className="list-decimal list-inside space-y-1 text-blue-300/80">
-            <li>Scan the QR code and complete your UPI payment</li>
+            <li>Scan the QR code or copy the UPI ID and complete your payment</li>
             <li>Enter the amount below and submit your request</li>
             <li>Admin will verify your payment and credit your balance</li>
           </ol>
