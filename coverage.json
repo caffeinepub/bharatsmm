@@ -1,46 +1,58 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-28T10:50:41.544Z",
+  "generatedAt": "2026-02-28T11:00:59.037Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-19",
-        "summary": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to display the UPI ID '8825245372-l3c6@ibl' prominently in the 'Scan & Pay' section. Show it as a copyable text field or highlighted label with a 'Copy UPI ID' button, instructing users to pay to this UPI ID via any UPI app (PhonePe, Google Pay, Paytm, etc.).",
+        "id": "REQ-21",
+        "summary": "Add a backend Motoko function `addBalanceToUser(userId: Principal, amount: Nat) → Result` (admin-only) that allows the admin to directly credit a specified amount (in paise/smallest unit) to any user's balance. The function must reject calls from non-admin principals.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-22",
+        "summary": "Add a TanStack Query mutation hook `useAddBalanceToUser` in `frontend/src/hooks/useQueries.ts` that calls the backend `addBalanceToUser` function. On success, invalidate the relevant balance/user queries. Follow the same pattern as existing mutation hooks in that file.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AddFunds.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AddFunds.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
-        "id": "REQ-20",
-        "summary": "Replace the existing QR code image on the Add Funds page (`frontend/src/pages/AddFunds.tsx`) with the newly generated PhonePe QR code image (`frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png`). Display it in the 'Scan & Pay' section above the UPI ID, with a label 'Scan with PhonePe or any UPI app' and the account holder name 'Mr Sandeep Kumar' shown below the QR code.",
+        "id": "REQ-23",
+        "summary": "Add an 'Add Balance' section or tab to the existing Admin Dashboard page (`frontend/src/pages/AdminDashboard.tsx`). It must include a principal input field, an amount input field (in INR), and a 'Add Balance' submit button. On submit, call `useAddBalanceToUser` and display a success or error toast. Apply the existing BharatSMM dark navy/orange-red theme consistently.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AddFunds.tsx"
+          "frontend/src/pages/AdminDashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AddFunds.tsx"
+          "frontend/src/pages/AdminDashboard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png",
-    "frontend/src/pages/AddFunds.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/AdminDashboard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -81,12 +81,13 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   /**
-   * / Add funds to a user&apos;s balance. Admin only.
+   * / Add funds to a user's balance. Admin only.
    */
   'addBalance' : ActorMethod<[Principal, bigint], undefined>,
+  'addBalanceToUser' : ActorMethod<[Principal, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   /**
-   * / Get the caller&apos;s current balance. Requires user role.
+   * / Get the caller's current balance. Requires user role.
    */
   'getBalance' : ActorMethod<[], bigint>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -112,7 +113,7 @@ export interface _SERVICE {
   'placeOrder' : ActorMethod<[NewOrderRequest], bigint>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   /**
-   * / Update an order&apos;s status. Admin only.
+   * / Update an order's status. Admin only.
    */
   'updateOrderStatus' : ActorMethod<[bigint, T], undefined>,
   'updateServicePrice' : ActorMethod<[bigint, number], undefined>,

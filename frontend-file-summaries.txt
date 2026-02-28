@@ -1,7 +1,7 @@
 {
   "frontend/src/index.css": "Global styles with dark navy OKLCH color system, Space Grotesk/Inter fonts, glass-card and brand-gradient utility classes.",
   "frontend/tailwind.config.js": "Extended Tailwind config with BharatSMM brand colors, navy palette, Space Grotesk/Inter fonts, brand shadow, and fade-in animation.",
-  "frontend/src/hooks/useQueries.ts": "All React Query hooks for BharatSMM backend including user profile, services, orders, balance, top-up, and admin operations (useIsAdmin, useUpdateServicePrice, useUpdateOrderStatus, useAddBalance).",
+  "frontend/src/hooks/useQueries.ts": "All React Query hooks for BharatSMM backend including user profile, services, orders, balance, top-up, and admin operations (useIsAdmin, useUpdateServicePrice, useUpdateOrderStatus, useAddBalance, useAddBalanceToUser).",
   "frontend/src/utils/orderCalculations.ts": "Utility functions for order cost calculation (float pricePer1000), INR formatting, and bigint balance display.",
   "frontend/src/components/OrderStatusBadge.tsx": "Colored pill badge component mapping all order status enum values to styled badges with appropriate colors.",
   "frontend/src/components/Layout.tsx": "Persistent sidebar layout with BharatSMM logo, all navigation links, conditional amber-styled Admin Panel link for admins, sign-out button, and caffeine.ai footer attribution.",
@@ -15,5 +15,5 @@
   "frontend/src/pages/LoginPage.tsx": "Full-screen login landing page with BharatSMM branding, feature highlights, Internet Identity login button, and caffeine.ai footer.",
   "frontend/src/App.tsx": "Main app with TanStack Router, QueryClient, ThemeProvider, and all routes (/, /dashboard, /new-order, /orders, /services, /add-funds, /profile, /admin); handles auth gating, loading state, and profile setup modal.",
   "frontend/index.html": "HTML entry with BharatSMM title, meta description, Open Graph/Twitter Card tags, favicon, and dark class on html element.",
-  "frontend/src/pages/AdminDashboard.tsx": "Admin-only panel with three tabs — Approve Top-ups (credit user balance by principal), Order Status (update orders by ID or from list), and Service Prices (editable price table)."
+  "frontend/src/pages/AdminDashboard.tsx": "Admin-only panel with four tabs — Add Balance (directly credit user by principal), Approve Top-ups (credit user balance), Order Status (update orders by ID or from list), and Service Prices (editable price table)."
 }

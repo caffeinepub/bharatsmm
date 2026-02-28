@@ -1,11 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 15,
   "summary": "SMM (Social Media Marketing) panel app named 'bharatsmm'. User wants an Admin Dashboard with admin access to approve pending top-up requests and manage orders.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Edit Images\n- Crop to just the QR code and account info area, removing the footer copyright text and extra whitespace, keeping the PhonePe logo header, 'ACCEPTED HERE' label, QR code, and 'Mr Sandeep Kumar' name (AccountQRCodeFino Payments Bank - 4703_LIGHT_THEME.png > bharatsmm-phonepe-qr.dim_400x600.png)",
   "existing_features": [
     {
       "id": "feature-build-a-multi-page-react-frontend-for-bharatsmm-with-the-following-pages-1-dashboard-account-balance-summary-recent-orders-count-quick-order-shortcut-2-new-order-service-category-selector-service-dropdown-with-price-min-max-info-link-input-quantity-input-order-total-calculator-submit-button-3-orders-paginated-table-of-past-orders-showing-id-service-name-link-quantity-status-badge-date-4-services-read-only-catalog-listing-all-available-services-grouped-by-category-with-pricing-5-add-funds-display-balance-and-a-form-to-request-a-top-up-amount-input-submit-6-profile-display-logged-in-user-principal",
@@ -118,6 +117,22 @@
         "REQ-20"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-tanstack-query-mutation-hook-useaddbalancetouser-in-frontend-src-hooks-usequeries-ts-that-calls-the-backend-addbalancetouser-function-on-success-invalidate-the-relevant-balance-user-queries-follow-the-same-pattern-as-existing-mutation-hooks-in-that-file",
+      "title": "Add a TanStack Query mutation hook `useAddBalanceToUser` in `frontend/src/hooks/useQueries.ts` that calls the backend `addBalanceToUser` function. On success, invalidate the relevant balance/user queries. Follow the same pattern as existing mutation hooks in that file.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-add-balance-section-or-tab-to-the-existing-admin-dashboard-page-frontend-src-pages-admindashboard-tsx-it-must-include-a-principal-input-field-an-amount-input-field-in-inr-and-a-add-balance-submit-button-on-submit-call-useaddbalancetouser-and-display-a-success-or-error-toast-apply-the-existing-bharatsmm-dark-navy-orange-red-theme-consistently",
+      "title": "Add an 'Add Balance' section or tab to the existing Admin Dashboard page (`frontend/src/pages/AdminDashboard.tsx`). It must include a principal input field, an amount input field (in INR), and a 'Add Balance' submit button. On submit, call `useAddBalanceToUser` and display a success or error toast. Apply the existing BharatSMM dark navy/orange-red theme consistently.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -203,6 +218,14 @@
       "id": "AR-15",
       "summary": "Update the Add Funds page to display the UPI ID '8825245372-l3c6@ibl' as the payment method, and provide instructions/location for uploading a custom QR code image for users to scan and pay.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add a backend Motoko function `addBalanceToUser(userId: Principal, amount: Nat) → Result` (admin-only) that allows the admin to directly credit a specified amount (in paise/smallest unit) to any user's balance. The function must reject calls from non-admin principals.",
+      "reqIds": [
+        "REQ-21"
+      ],
       "status": "pending"
     }
   ],

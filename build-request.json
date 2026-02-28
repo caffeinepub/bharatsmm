@@ -1,64 +1,80 @@
 {
   "kind": "build_request",
-  "title": "Update Add Funds page with UPI ID and PhonePe QR code",
+  "title": "Add balance top-up capability for admin to credit user accounts",
   "projectName": "BharatSMM",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-19",
-      "text": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to display the UPI ID '8825245372-l3c6@ibl' prominently in the 'Scan & Pay' section. Show it as a copyable text field or highlighted label with a 'Copy UPI ID' button, instructing users to pay to this UPI ID via any UPI app (PhonePe, Google Pay, Paytm, etc.).",
-      "target": "frontend",
+      "id": "REQ-21",
+      "text": "Add a backend Motoko function `addBalanceToUser(userId: Principal, amount: Nat) → Result` (admin-only) that allows the admin to directly credit a specified amount (in paise/smallest unit) to any user's balance. The function must reject calls from non-admin principals.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-last"
         ],
         "quotes": [
-          "Use this UPI ID for the 'Add Funds' section: 8825245372-l3c6@ibl"
+          "Adim dedo"
         ]
       },
       "acceptanceCriteria": [
-        "UPI ID '8825245372-l3c6@ibl' is displayed visibly in the Add Funds page Scan & Pay section",
-        "A 'Copy UPI ID' button or similar affordance allows users to copy the UPI ID to clipboard",
-        "Instructional text tells users to pay using any UPI app to this UPI ID",
-        "The UPI ID display is styled consistently with the existing dark navy/orange-red BharatSMM theme"
+        "Function `addBalanceToUser` exists in `backend/main.mo`",
+        "Only the admin principal can call it; non-admin callers receive an error result",
+        "On success, the target user's balance is increased by the specified amount",
+        "Returns a Result type indicating success or failure"
       ]
     },
     {
-      "id": "REQ-20",
-      "text": "Replace the existing QR code image on the Add Funds page (`frontend/src/pages/AddFunds.tsx`) with the newly generated PhonePe QR code image (`frontend/public/assets/generated/bharatsmm-phonepe-qr.dim_400x600.png`). Display it in the 'Scan & Pay' section above the UPI ID, with a label 'Scan with PhonePe or any UPI app' and the account holder name 'Mr Sandeep Kumar' shown below the QR code.",
+      "id": "REQ-22",
+      "text": "Add a TanStack Query mutation hook `useAddBalanceToUser` in `frontend/src/hooks/useQueries.ts` that calls the backend `addBalanceToUser` function. On success, invalidate the relevant balance/user queries. Follow the same pattern as existing mutation hooks in that file.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-last"
         ],
         "quotes": [
-          "Also, let me know where I can upload my QR Code image so users can scan and pay easily"
+          "Adim dedo"
         ]
       },
       "acceptanceCriteria": [
-        "The PhonePe QR code image is displayed prominently in the Scan & Pay section of the Add Funds page",
-        "The label 'Scan with PhonePe or any UPI app' appears above or alongside the QR code",
-        "Account holder name 'Mr Sandeep Kumar' is shown beneath the QR code",
-        "The existing old QR code image reference is replaced with the new one",
-        "QR code section is styled consistently with the BharatSMM dark navy/orange-red theme"
+        "`useAddBalanceToUser` hook is exported from `frontend/src/hooks/useQueries.ts`",
+        "Hook accepts userId (Principal) and amount (Nat) as mutation variables",
+        "On success, related queries are invalidated so balances refresh",
+        "Follows the same pattern as existing mutation hooks in the file"
+      ]
+    },
+    {
+      "id": "REQ-23",
+      "text": "Add an 'Add Balance' section or tab to the existing Admin Dashboard page (`frontend/src/pages/AdminDashboard.tsx`). It must include a principal input field, an amount input field (in INR), and a 'Add Balance' submit button. On submit, call `useAddBalanceToUser` and display a success or error toast. Apply the existing BharatSMM dark navy/orange-red theme consistently.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "Adim dedo"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin Dashboard has an 'Add Balance' section/tab",
+        "Section includes a principal text input and an INR amount number input",
+        "Clicking 'Add Balance' calls the mutation and shows a success toast on success",
+        "Error cases show an error toast",
+        "UI matches the existing BharatSMM dark navy/orange-red theme"
       ]
     }
   ],
   "constraints": [
-    "UPI ID must be displayed exactly as provided: 8825245372-l3c6@ibl",
-    "Do not modify any files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
-    "The new QR code image must be served as a static asset from frontend/public/assets/generated — do not route it through the backend"
+    "Do not modify any files listed under frontend.immutablePaths",
+    "Admin-only backend functions must reject non-admin callers",
+    "All Motoko logic must remain in the single actor file backend/main.mo"
   ],
   "nonGoals": [
-    "Do not add any real-time payment verification or UPI payment gateway integration",
-    "Do not change the top-up request submission logic or backend validation",
-    "Do not modify the minimum deposit amount (already set to ₹1)",
-    "Do not change any other pages besides AddFunds.tsx"
+    "Changing existing top-up request approval flow",
+    "Adding any new pages beyond the Admin Dashboard modification",
+    "Modifying service catalog or order management features"
   ],
   "imageRequirements": {
     "required": [],
-    "edits": [
-      "Crop to just the QR code and account info area, removing the footer copyright text and extra whitespace, keeping the PhonePe logo header, 'ACCEPTED HERE' label, QR code, and 'Mr Sandeep Kumar' name (AccountQRCodeFino Payments Bank - 4703_LIGHT_THEME.png > bharatsmm-phonepe-qr.dim_400x600.png)"
-    ]
+    "edits": []
   }
 }

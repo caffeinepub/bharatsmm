@@ -194,3 +194,18 @@ export function useAddBalance() {
     },
   });
 }
+
+export function useAddBalanceToUser() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, amount }: { userId: Principal; amount: bigint }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.addBalanceToUser(userId, amount);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['balance'] });
+    },
+  });
+}

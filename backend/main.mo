@@ -227,7 +227,7 @@ actor {
         pricePer1000 = 1.8;
         minOrder = 20;
         maxOrder = 12000;
-        description = "Increase your channel&apos;s reach.";
+        description = "Increase your channel's reach.";
       },
       {
         id = 16;
@@ -397,7 +397,7 @@ actor {
 
   // ── Balance Functions ───────────────────────────────────────────────────────
 
-  /// Get the caller&apos;s current balance. Requires user role.
+  /// Get the caller's current balance. Requires user role.
   public query ({ caller }) func getBalance() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can check their balance");
@@ -408,7 +408,7 @@ actor {
     };
   };
 
-  /// Add funds to a user&apos;s balance. Admin only.
+  /// Add funds to a user's balance. Admin only.
   public shared ({ caller }) func addBalance(user : Principal, amount : Nat) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can add balance");
@@ -420,7 +420,18 @@ actor {
     balances.add(user, current + amount);
   };
 
-  /// Update an order&apos;s status. Admin only.
+  public shared ({ caller }) func addBalanceToUser(userId : Principal, amount : Nat) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can add balance to user");
+    };
+    let currentBalance = switch (balances.get(userId)) {
+      case (null) { 0 };
+      case (?bal) { bal };
+    };
+    balances.add(userId, currentBalance + amount);
+  };
+
+  /// Update an order's status. Admin only.
   public shared ({ caller }) func updateOrderStatus(orderId : Nat, status : OrderStatus.T) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can update order status");

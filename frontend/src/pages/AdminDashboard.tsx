@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { useIsAdmin, useListServices, useUpdateServicePrice, useUpdateOrderStatus, useAddBalance } from '../hooks/useQueries';
+import {
+  useIsAdmin,
+  useListServices,
+  useUpdateServicePrice,
+  useUpdateOrderStatus,
+  useAddBalance,
+  useAddBalanceToUser,
+} from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { T as OrderStatus } from '../backend';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -7,11 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, ShieldCheck, AlertTriangle, Save, IndianRupee, Users, ClipboardList } from 'lucide-react';
+import { Loader2, ShieldCheck, AlertTriangle, Save, IndianRupee, Users, ClipboardList, PlusCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
 import OrderStatusBadge from '../components/OrderStatusBadge';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useActor } from '../hooks/useActor';
 
 // Admin-only: fetch all orders via admin access
@@ -23,9 +30,6 @@ function useAdminAllOrders() {
     queryKey: ['adminAllOrders'],
     queryFn: async () => {
       if (!actor || !identity) return [];
-      // Admin can list all orders - we use a workaround by listing for each known user
-      // Since backend only exposes listOrdersByUser, admin lists their own + approves via updateOrderStatus
-      // For a full admin view, we list orders for the admin principal and rely on the admin knowing order IDs
       return actor.listOrdersByUser(identity.getPrincipal());
     },
     enabled: !!actor && !isFetching && !!identity,
@@ -273,7 +277,7 @@ function OrderManagementTab() {
                               variant="outline"
                               onClick={() => handleStatusUpdate(order.id, OrderStatus.completed)}
                               disabled={isUpdating || isPending}
-                              className="h-7 text-xs border-green-500/30 text-green-400 hover:bg-green-500/10"
+                              className="h-7 text-xs border-border/50 hover:border-green-500/50 hover:text-green-400"
                             >
                               Done
                             </Button>
@@ -293,100 +297,169 @@ function OrderManagementTab() {
 }
 
 // Approve Top-ups Tab
-function ApproveTopupsTab() {
+function ApproveTopUpsTab() {
   const { mutateAsync: addBalance, isPending } = useAddBalance();
-  const [principalStr, setPrincipalStr] = useState('');
-  const [amount, setAmount] = useState('');
+  const [principalInput, setPrincipalInput] = useState('');
+  const [amountInput, setAmountInput] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleApprove = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!principalStr.trim()) {
+    const amount = parseFloat(amountInput);
+    if (!principalInput.trim()) {
       toast.error('Please enter a principal ID');
       return;
     }
-    const amt = parseInt(amount, 10);
-    if (isNaN(amt) || amt <= 0) {
+    if (isNaN(amount) || amount <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
+    let userPrincipal: Principal;
     try {
-      const user = Principal.fromText(principalStr.trim());
-      await addBalance({ user, amount: BigInt(amt) });
-      toast.success(`₹${amt} credited to ${principalStr.slice(0, 12)}...`);
-      setPrincipalStr('');
-      setAmount('');
+      userPrincipal = Principal.fromText(principalInput.trim());
+    } catch {
+      toast.error('Invalid principal ID format');
+      return;
+    }
+    try {
+      await addBalance({ user: userPrincipal, amount: BigInt(Math.round(amount * 100)) });
+      toast.success(`₹${amount.toFixed(2)} added to user's balance!`);
+      setPrincipalInput('');
+      setAmountInput('');
     } catch (err: any) {
       toast.error(err?.message || 'Failed to add balance');
     }
   };
 
   return (
-    <div className="space-y-5">
-      <p className="text-sm text-muted-foreground">
-        After verifying a UPI payment, manually credit the user's balance by entering their principal ID and amount.
-      </p>
-
-      <form onSubmit={handleSubmit} className="glass-card rounded-xl p-6 border border-border/30 space-y-4">
-        <h3 className="font-semibold text-foreground flex items-center gap-2">
-          <IndianRupee size={18} className="text-brand" />
-          Credit User Balance
-        </h3>
-
-        <div className="space-y-2">
-          <Label htmlFor="principal" className="text-foreground font-medium">
-            User Principal ID <span className="text-brand">*</span>
-          </Label>
-          <Input
-            id="principal"
-            type="text"
-            placeholder="e.g. aaaaa-aa or full principal"
-            value={principalStr}
-            onChange={(e) => setPrincipalStr(e.target.value)}
-            className="bg-background border-border/50 focus:border-brand font-mono text-sm"
-            required
-          />
-          <p className="text-xs text-muted-foreground">
-            The user can find their principal ID on their Profile page.
-          </p>
+    <div className="space-y-6">
+      <div className="glass-card rounded-xl p-5 border border-border/30 space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <IndianRupee size={16} className="text-brand" />
+          <h3 className="font-semibold text-foreground">Approve Top-up Request</h3>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="credit-amount" className="text-foreground font-medium">
-            Amount (₹) <span className="text-brand">*</span>
-          </Label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">₹</span>
+        <p className="text-sm text-muted-foreground">
+          Enter the user's principal ID and the INR amount to credit their account.
+        </p>
+        <form onSubmit={handleApprove} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">User Principal ID</Label>
             <Input
-              id="credit-amount"
-              type="number"
-              min={1}
-              placeholder="Amount to credit"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="pl-7 bg-background border-border/50 focus:border-brand"
-              required
+              type="text"
+              placeholder="e.g. aaaaa-aa or xxxxx-xxxxx-xxxxx-xxxxx-cai"
+              value={principalInput}
+              onChange={(e) => setPrincipalInput(e.target.value)}
+              className="bg-background border-border/50 focus:border-brand font-mono text-sm"
             />
           </div>
-        </div>
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">Amount (INR ₹)</Label>
+            <Input
+              type="number"
+              placeholder="e.g. 500"
+              min="1"
+              step="0.01"
+              value={amountInput}
+              onChange={(e) => setAmountInput(e.target.value)}
+              className="bg-background border-border/50 focus:border-brand"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isPending || !principalInput.trim() || !amountInput}
+            className="bg-brand hover:bg-brand/90 text-white w-full"
+          >
+            {isPending ? (
+              <><Loader2 size={14} className="animate-spin mr-2" />Processing...</>
+            ) : (
+              <><IndianRupee size={14} className="mr-2" />Approve & Credit Balance</>
+            )}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
 
-        <Button
-          type="submit"
-          disabled={isPending || !principalStr || !amount}
-          className="bg-brand hover:bg-brand/90 text-white font-semibold"
-        >
-          {isPending ? (
-            <>
-              <Loader2 size={16} className="mr-2 animate-spin" />
-              Crediting...
-            </>
-          ) : (
-            <>
-              <Users size={16} className="mr-2" />
-              Credit Balance
-            </>
-          )}
-        </Button>
-      </form>
+// Add Balance Tab
+function AddBalanceTab() {
+  const { mutateAsync: addBalanceToUser, isPending } = useAddBalanceToUser();
+  const [principalInput, setPrincipalInput] = useState('');
+  const [amountInput, setAmountInput] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseFloat(amountInput);
+    if (!principalInput.trim()) {
+      toast.error('Please enter a principal ID');
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    let userPrincipal: Principal;
+    try {
+      userPrincipal = Principal.fromText(principalInput.trim());
+    } catch {
+      toast.error('Invalid principal ID format');
+      return;
+    }
+    try {
+      await addBalanceToUser({ userId: userPrincipal, amount: BigInt(Math.round(amount * 100)) });
+      toast.success(`₹${amount.toFixed(2)} successfully added to user's balance!`);
+      setPrincipalInput('');
+      setAmountInput('');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to add balance');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="glass-card rounded-xl p-5 border border-border/30 space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <PlusCircle size={16} className="text-brand" />
+          <h3 className="font-semibold text-foreground">Add Balance to User</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Directly credit an INR amount to any user's account by entering their principal ID.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">User Principal ID</Label>
+            <Input
+              type="text"
+              placeholder="e.g. aaaaa-aa or xxxxx-xxxxx-xxxxx-xxxxx-cai"
+              value={principalInput}
+              onChange={(e) => setPrincipalInput(e.target.value)}
+              className="bg-background border-border/50 focus:border-brand font-mono text-sm"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-muted-foreground text-xs">Amount (INR ₹)</Label>
+            <Input
+              type="number"
+              placeholder="e.g. 100"
+              min="1"
+              step="0.01"
+              value={amountInput}
+              onChange={(e) => setAmountInput(e.target.value)}
+              className="bg-background border-border/50 focus:border-brand"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isPending || !principalInput.trim() || !amountInput}
+            className="bg-brand hover:bg-brand/90 text-white w-full"
+          >
+            {isPending ? (
+              <><Loader2 size={14} className="animate-spin mr-2" />Adding Balance...</>
+            ) : (
+              <><PlusCircle size={14} className="mr-2" />Add Balance</>
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -396,7 +469,7 @@ export default function AdminDashboard() {
 
   if (adminLoading) {
     return (
-      <div className="flex items-center justify-center py-24">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 size={28} className="animate-spin text-muted-foreground" />
       </div>
     );
@@ -407,42 +480,64 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-          <ShieldCheck size={20} className="text-amber-400" />
+        <div className="w-10 h-10 rounded-xl bg-brand/20 flex items-center justify-center">
+          <ShieldCheck size={20} className="text-brand" />
         </div>
         <div>
           <h1 className="text-2xl font-bold font-display text-foreground">Admin Panel</h1>
-          <p className="text-muted-foreground text-sm">Manage orders, balances, and service prices.</p>
+          <p className="text-sm text-muted-foreground">Manage services, orders, and user balances</p>
         </div>
       </div>
 
-      <Tabs defaultValue="topups">
-        <TabsList className="bg-muted/30 border border-border/30">
-          <TabsTrigger value="topups" className="data-[state=active]:bg-brand data-[state=active]:text-white">
+      {/* Tabs */}
+      <Tabs defaultValue="add-balance" className="space-y-4">
+        <TabsList className="bg-muted/30 border border-border/30 p-1 h-auto flex-wrap gap-1">
+          <TabsTrigger
+            value="add-balance"
+            className="data-[state=active]:bg-brand data-[state=active]:text-white text-xs sm:text-sm"
+          >
+            <PlusCircle size={14} className="mr-1.5" />
+            Add Balance
+          </TabsTrigger>
+          <TabsTrigger
+            value="approve-topups"
+            className="data-[state=active]:bg-brand data-[state=active]:text-white text-xs sm:text-sm"
+          >
             <IndianRupee size={14} className="mr-1.5" />
             Approve Top-ups
           </TabsTrigger>
-          <TabsTrigger value="orders" className="data-[state=active]:bg-brand data-[state=active]:text-white">
+          <TabsTrigger
+            value="order-status"
+            className="data-[state=active]:bg-brand data-[state=active]:text-white text-xs sm:text-sm"
+          >
             <ClipboardList size={14} className="mr-1.5" />
             Order Status
           </TabsTrigger>
-          <TabsTrigger value="prices" className="data-[state=active]:bg-brand data-[state=active]:text-white">
-            <IndianRupee size={14} className="mr-1.5" />
+          <TabsTrigger
+            value="service-prices"
+            className="data-[state=active]:bg-brand data-[state=active]:text-white text-xs sm:text-sm"
+          >
+            <Users size={14} className="mr-1.5" />
             Service Prices
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="topups" className="mt-6">
-          <ApproveTopupsTab />
+        <TabsContent value="add-balance">
+          <AddBalanceTab />
         </TabsContent>
 
-        <TabsContent value="orders" className="mt-6">
+        <TabsContent value="approve-topups">
+          <ApproveTopUpsTab />
+        </TabsContent>
+
+        <TabsContent value="order-status">
           <OrderManagementTab />
         </TabsContent>
 
-        <TabsContent value="prices" className="mt-6">
+        <TabsContent value="service-prices">
           <ServicePricesTab />
         </TabsContent>
       </Tabs>

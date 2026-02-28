@@ -63,12 +63,13 @@ export enum UserRole {
 }
 export interface backendInterface {
     /**
-     * / Add funds to a user&apos;s balance. Admin only.
+     * / Add funds to a user's balance. Admin only.
      */
     addBalance(user: Principal, amount: bigint): Promise<void>;
+    addBalanceToUser(userId: Principal, amount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     /**
-     * / Get the caller&apos;s current balance. Requires user role.
+     * / Get the caller's current balance. Requires user role.
      */
     getBalance(): Promise<bigint>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -94,7 +95,7 @@ export interface backendInterface {
     placeOrder(newOrder: NewOrderRequest): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     /**
-     * / Update an order&apos;s status. Admin only.
+     * / Update an order's status. Admin only.
      */
     updateOrderStatus(orderId: bigint, status: T): Promise<void>;
     updateServicePrice(serviceId: bigint, newPrice: number): Promise<void>;
