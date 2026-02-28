@@ -1,28 +1,28 @@
 /**
  * Calculate the total cost of an order.
- * @param pricePer1000 - Price per 1000 units (in smallest currency unit)
+ * @param pricePer1000 - Price per 1000 units (as a float/number)
  * @param quantity - Number of units ordered
- * @returns Total cost
+ * @returns Total cost in INR (integer, rounded down)
  */
-export function calculateOrderTotal(pricePer1000: bigint, quantity: number): number {
-  return (Number(pricePer1000) * quantity) / 1000;
+export function calculateOrderTotal(pricePer1000: number, quantity: number): number {
+  return Math.floor((quantity * pricePer1000) / 1000);
 }
 
 /**
- * Format a numeric value as currency (INR).
+ * Format a number as INR currency string.
  */
-export function formatCurrency(amount: number): string {
+export function formatINR(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(amount);
 }
 
 /**
- * Format a bigint balance value (stored as paise/smallest unit) to display.
+ * Format a bigint balance (stored as integer rupees) for display.
  */
-export function formatBalance(amount: bigint): string {
-  return formatCurrency(Number(amount) / 100);
+export function formatBalance(balance: bigint): string {
+  return `₹${balance.toString()}`;
 }

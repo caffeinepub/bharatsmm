@@ -1,96 +1,90 @@
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSaveCallerUserProfile } from '../hooks/useQueries';
-import { User } from 'lucide-react';
+import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
-interface ProfileSetupModalProps {
-  open: boolean;
-}
-
-export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
+export default function ProfileSetupModal() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const saveProfile = useSaveCallerUserProfile();
+  const { mutateAsync: saveProfile, isPending } = useSaveCallerUserProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    await saveProfile.mutateAsync({ name: name.trim(), email: email.trim() });
+    if (!name.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+    try {
+      await saveProfile({ name: name.trim(), email: email.trim() });
+      toast.success('Profile saved! Welcome to BharatSMM 🎉');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save profile');
+    }
   };
 
   return (
-    <Dialog open={open}>
-      <DialogContent className="bg-card border-border sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={true}>
+      <DialogContent className="sm:max-w-md bg-card border-border/50" showCloseButton={false}>
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl brand-gradient flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <DialogTitle className="font-display text-foreground">Welcome to BharatSMM!</DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm">
-                Set up your profile to get started.
-              </DialogDescription>
-            </div>
+            <img
+              src="/assets/generated/bharatsmm-logo.dim_256x256.png"
+              alt="BharatSMM"
+              className="w-10 h-10 rounded-xl object-cover"
+            />
+            <DialogTitle className="text-xl font-bold font-display">Welcome to BharatSMM!</DialogTitle>
           </div>
+          <DialogDescription className="text-muted-foreground">
+            Please set up your profile to get started with social media marketing services.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-foreground">
-              Full Name <span className="text-brand">*</span>
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-foreground font-medium">
+              Your Name <span className="text-brand">*</span>
             </Label>
             <Input
               id="name"
+              type="text"
+              placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              className="bg-background border-border text-foreground"
+              className="bg-background border-border/50 focus:border-brand"
               required
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-foreground">
-              Email Address
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-foreground font-medium">
+              Email Address <span className="text-muted-foreground text-xs">(optional)</span>
             </Label>
             <Input
               id="email"
               type="email"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="bg-background border-border text-foreground"
+              className="bg-background border-border/50 focus:border-brand"
             />
           </div>
 
-          {saveProfile.isError && (
-            <p className="text-sm text-destructive">
-              {saveProfile.error?.message ?? 'Failed to save profile. Please try again.'}
-            </p>
-          )}
-
           <Button
             type="submit"
-            disabled={saveProfile.isPending || !name.trim()}
-            className="w-full brand-gradient text-white hover:opacity-90 font-semibold"
+            disabled={isPending || !name.trim()}
+            className="w-full bg-brand hover:bg-brand/90 text-white font-semibold"
           >
-            {saveProfile.isPending ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            {isPending ? (
+              <>
+                <Loader2 size={16} className="mr-2 animate-spin" />
                 Saving...
-              </span>
+              </>
             ) : (
-              'Complete Setup'
+              'Get Started'
             )}
           </Button>
         </form>

@@ -1,293 +1,258 @@
-import React, { useState, useMemo } from 'react';
-import { ShoppingCart, AlertCircle, CheckCircle2, Info } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useMemo } from 'react';
+import { useListServices, usePlaceOrder, useGetBalance } from '../hooks/useQueries';
+import { Category } from '../backend';
+import { calculateOrderTotal, formatBalance } from '../utils/orderCalculations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useServices, usePlaceOrder } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { calculateOrderTotal, formatCurrency, formatBalance } from '../utils/orderCalculations';
-import { Category, type T__1 } from '../backend';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, ShoppingCart, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
-const categoryLabels: Record<Category, string> = {
+const CATEGORY_LABELS: Record<string, string> = {
   [Category.instagram]: '📸 Instagram',
   [Category.youtube]: '▶️ YouTube',
   [Category.twitterX]: '🐦 Twitter/X',
-  [Category.facebook]: '👥 Facebook',
   [Category.tiktok]: '🎵 TikTok',
+  [Category.facebook]: '👥 Facebook',
   [Category.telegram]: '✈️ Telegram',
 };
 
 export default function NewOrder() {
-  const { identity } = useInternetIdentity();
-  const { data: services, isLoading: servicesLoading } = useServices();
-  const placeOrder = usePlaceOrder();
-
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedServiceId, setSelectedServiceId] = useState<string>('');
   const [link, setLink] = useState('');
   const [quantity, setQuantity] = useState('');
   const [successOrderId, setSuccessOrderId] = useState<bigint | null>(null);
 
+  const { data: services, isLoading: servicesLoading } = useListServices();
+  const { data: balance } = useGetBalance();
+  const { mutateAsync: placeOrder, isPending } = usePlaceOrder();
+
+  const categories = useMemo(() => {
+    if (!services) return [];
+    const cats = new Set(services.map((s) => s.category as string));
+    return Array.from(cats);
+  }, [services]);
+
   const filteredServices = useMemo(() => {
     if (!services) return [];
     if (selectedCategory === 'all') return services;
-    return services.filter((s) => s.category === selectedCategory);
+    return services.filter((s) => (s.category as string) === selectedCategory);
   }, [services, selectedCategory]);
 
-  const selectedService: T__1 | undefined = useMemo(() => {
-    if (!services || !selectedServiceId) return undefined;
-    return services.find((s) => s.id.toString() === selectedServiceId);
+  const selectedService = useMemo(() => {
+    if (!services || !selectedServiceId) return null;
+    return services.find((s) => s.id.toString() === selectedServiceId) ?? null;
   }, [services, selectedServiceId]);
 
-  const quantityNum = parseInt(quantity, 10);
-  const isValidQuantity =
-    selectedService &&
-    !isNaN(quantityNum) &&
-    quantityNum >= Number(selectedService.minOrder) &&
-    quantityNum <= Number(selectedService.maxOrder);
-
-  const orderTotal = selectedService && isValidQuantity
-    ? calculateOrderTotal(selectedService.pricePer1000, quantityNum)
-    : null;
-
-  const handleCategoryChange = (val: string) => {
-    setSelectedCategory(val);
-    setSelectedServiceId('');
-  };
+  const orderTotal = useMemo(() => {
+    if (!selectedService || !quantity) return 0;
+    const qty = parseInt(quantity, 10);
+    if (isNaN(qty) || qty <= 0) return 0;
+    return calculateOrderTotal(selectedService.pricePer1000, qty);
+  }, [selectedService, quantity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedService || !isValidQuantity || !link.trim()) return;
+    if (!selectedService) {
+      toast.error('Please select a service');
+      return;
+    }
+    const qty = parseInt(quantity, 10);
+    if (isNaN(qty) || qty < Number(selectedService.minOrder) || qty > Number(selectedService.maxOrder)) {
+      toast.error(`Quantity must be between ${selectedService.minOrder} and ${selectedService.maxOrder}`);
+      return;
+    }
+    if (!link.trim()) {
+      toast.error('Please enter a link');
+      return;
+    }
+    if (balance !== undefined && orderTotal > Number(balance)) {
+      toast.error('Insufficient balance. Please add funds.');
+      return;
+    }
 
     try {
-      const orderId = await placeOrder.mutateAsync({
+      const orderId = await placeOrder({
         service: selectedService.id,
         link: link.trim(),
-        quantity: BigInt(quantityNum),
+        quantity: BigInt(qty),
       });
       setSuccessOrderId(orderId);
       setLink('');
       setQuantity('');
       setSelectedServiceId('');
-    } catch {
-      // error handled via placeOrder.error
+      toast.success(`Order #${orderId} placed successfully!`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to place order');
     }
   };
 
-  if (!identity) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-8">
-        <div className="w-16 h-16 rounded-2xl brand-gradient flex items-center justify-center">
-          <AlertCircle className="w-8 h-8 text-white" />
-        </div>
-        <h2 className="font-display text-2xl font-bold text-foreground">Login Required</h2>
-        <p className="text-muted-foreground text-center max-w-sm">
-          Please log in to place orders.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">New Order</h1>
+        <h1 className="text-2xl font-bold font-display text-foreground">New Order</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Select a service and place your SMM order.
+          Choose a service and place your SMM order.
         </p>
       </div>
 
-      {successOrderId && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-green-500/10 border border-green-500/30">
-          <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
-          <div>
-            <p className="text-green-400 font-medium text-sm">Order placed successfully!</p>
-            <p className="text-green-400/70 text-xs">Order ID: #{successOrderId.toString()}</p>
-          </div>
-          <button
-            onClick={() => setSuccessOrderId(null)}
-            className="ml-auto text-green-400/50 hover:text-green-400 text-xs"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+      {/* Balance Info */}
+      <div className="glass-card rounded-xl p-4 border border-border/30 flex items-center justify-between">
+        <span className="text-sm text-muted-foreground">Available Balance</span>
+        <span className="font-bold text-foreground text-lg">{formatBalance(balance ?? BigInt(0))}</span>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Category Filter */}
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-foreground">1. Select Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-              <SelectTrigger className="bg-background border-border text-foreground">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                <SelectItem value="all">All Categories</SelectItem>
-                {Object.entries(categoryLabels).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        {/* Service Selection */}
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-foreground">2. Select Service</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Select
-              value={selectedServiceId}
-              onValueChange={setSelectedServiceId}
-              disabled={servicesLoading}
+        <div className="space-y-2">
+          <Label className="text-foreground font-medium">Category</Label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => { setSelectedCategory('all'); setSelectedServiceId(''); }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-brand text-white'
+                  : 'bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
             >
-              <SelectTrigger className="bg-background border-border text-foreground">
-                <SelectValue placeholder={servicesLoading ? 'Loading services...' : 'Choose a service'} />
+              All
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => { setSelectedCategory(cat); setSelectedServiceId(''); }}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-brand text-white'
+                    : 'bg-muted/50 text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                {CATEGORY_LABELS[cat] ?? cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Service Select */}
+        <div className="space-y-2">
+          <Label className="text-foreground font-medium">
+            Service <span className="text-brand">*</span>
+          </Label>
+          {servicesLoading ? (
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <Loader2 size={16} className="animate-spin" />
+              Loading services...
+            </div>
+          ) : (
+            <Select value={selectedServiceId} onValueChange={setSelectedServiceId}>
+              <SelectTrigger className="bg-background border-border/50 focus:border-brand">
+                <SelectValue placeholder="Select a service..." />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
+              <SelectContent className="bg-card border-border/50">
                 {filteredServices.map((service) => (
                   <SelectItem key={service.id.toString()} value={service.id.toString()}>
-                    {service.name} — ₹{(Number(service.pricePer1000) / 100).toFixed(2)}/1000
+                    <span className="font-medium">{service.name}</span>
+                    <span className="text-muted-foreground ml-2 text-xs">
+                      ₹{service.pricePer1000}/1000 | Min: {service.minOrder.toString()} | Max: {service.maxOrder.toString()}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+          )}
+        </div>
 
-            {selectedService && (
-              <div className="p-3 rounded-lg bg-background border border-border space-y-1.5">
-                <p className="text-xs text-muted-foreground">{selectedService.description}</p>
-                <div className="flex flex-wrap gap-3 text-xs">
-                  <span className="text-foreground">
-                    <span className="text-muted-foreground">Price: </span>
-                    <span className="text-brand font-semibold">
-                      {formatCurrency(Number(selectedService.pricePer1000) / 100)}/1000
-                    </span>
-                  </span>
-                  <span className="text-foreground">
-                    <span className="text-muted-foreground">Min: </span>
-                    {selectedService.minOrder.toString()}
-                  </span>
-                  <span className="text-foreground">
-                    <span className="text-muted-foreground">Max: </span>
-                    {selectedService.maxOrder.toString()}
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Link & Quantity */}
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold text-foreground">3. Order Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="link" className="text-foreground text-sm">
-                Link / URL <span className="text-brand">*</span>
-              </Label>
-              <Input
-                id="link"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="https://instagram.com/yourprofile"
-                className="bg-background border-border text-foreground"
-                required
-              />
+        {/* Service Info */}
+        {selectedService && (
+          <div className="glass-card rounded-xl p-4 border border-brand/30 space-y-2">
+            <p className="text-sm font-semibold text-foreground">{selectedService.name}</p>
+            <p className="text-xs text-muted-foreground">{selectedService.description}</p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              <span className="text-brand font-medium">₹{selectedService.pricePer1000}/1000</span>
+              <span className="text-muted-foreground">Min: {selectedService.minOrder.toString()}</span>
+              <span className="text-muted-foreground">Max: {selectedService.maxOrder.toString()}</span>
             </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="quantity" className="text-foreground text-sm">
-                Quantity <span className="text-brand">*</span>
-                {selectedService && (
-                  <span className="text-muted-foreground font-normal ml-2">
-                    ({selectedService.minOrder.toString()} – {selectedService.maxOrder.toString()})
-                  </span>
-                )}
-              </Label>
-              <Input
-                id="quantity"
-                type="number"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                placeholder="Enter quantity"
-                min={selectedService ? Number(selectedService.minOrder) : 1}
-                max={selectedService ? Number(selectedService.maxOrder) : undefined}
-                className="bg-background border-border text-foreground"
-                required
-              />
-              {quantity && selectedService && !isValidQuantity && (
-                <p className="text-xs text-destructive flex items-center gap-1">
-                  <Info className="w-3 h-3" />
-                  Quantity must be between {selectedService.minOrder.toString()} and {selectedService.maxOrder.toString()}
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Order Summary */}
-        {orderTotal !== null && (
-          <Card className="bg-card border-brand/30 border">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Order Total</p>
-                  <p className="text-2xl font-display font-bold text-brand">
-                    {formatCurrency(orderTotal / 100)}
-                  </p>
-                </div>
-                <div className="text-right text-xs text-muted-foreground">
-                  <p>{quantityNum.toLocaleString()} units</p>
-                  <p>@ {formatCurrency(Number(selectedService!.pricePer1000) / 100)}/1000</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          </div>
         )}
 
-        {placeOrder.isError && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30">
-            <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-            <p className="text-sm text-destructive">
-              {placeOrder.error?.message ?? 'Failed to place order. Please try again.'}
+        {/* Link */}
+        <div className="space-y-2">
+          <Label htmlFor="link" className="text-foreground font-medium">
+            Link / URL <span className="text-brand">*</span>
+          </Label>
+          <Input
+            id="link"
+            type="url"
+            placeholder="https://instagram.com/yourprofile"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            className="bg-background border-border/50 focus:border-brand"
+            required
+          />
+        </div>
+
+        {/* Quantity */}
+        <div className="space-y-2">
+          <Label htmlFor="quantity" className="text-foreground font-medium">
+            Quantity <span className="text-brand">*</span>
+          </Label>
+          <Input
+            id="quantity"
+            type="number"
+            placeholder={
+              selectedService
+                ? `${selectedService.minOrder} - ${selectedService.maxOrder}`
+                : 'Enter quantity'
+            }
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            min={selectedService ? Number(selectedService.minOrder) : 1}
+            max={selectedService ? Number(selectedService.maxOrder) : undefined}
+            className="bg-background border-border/50 focus:border-brand"
+            required
+          />
+          {selectedService && (
+            <p className="text-xs text-muted-foreground">
+              Min: {selectedService.minOrder.toString()} — Max: {selectedService.maxOrder.toString()}
             </p>
+          )}
+        </div>
+
+        {/* Order Total */}
+        {orderTotal > 0 && (
+          <div className="glass-card rounded-xl p-4 border border-border/30 flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Order Total</span>
+            <span className="text-xl font-bold text-brand">₹{orderTotal}</span>
+          </div>
+        )}
+
+        {/* Insufficient Balance Warning */}
+        {orderTotal > 0 && balance !== undefined && orderTotal > Number(balance) && (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+            <AlertCircle size={16} />
+            Insufficient balance. Please add funds before placing this order.
           </div>
         )}
 
         <Button
           type="submit"
-          disabled={
-            placeOrder.isPending ||
-            !selectedService ||
-            !isValidQuantity ||
-            !link.trim()
-          }
-          className="w-full brand-gradient text-white hover:opacity-90 font-semibold h-11"
+          disabled={isPending || !selectedServiceId || !link || !quantity}
+          className="w-full bg-brand hover:bg-brand/90 text-white font-semibold py-3"
         >
-          {placeOrder.isPending ? (
-            <span className="flex items-center gap-2">
-              <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+          {isPending ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
               Placing Order...
-            </span>
+            </>
           ) : (
-            <span className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" />
+            <>
+              <ShoppingCart size={16} className="mr-2" />
               Place Order
-            </span>
+            </>
           )}
         </Button>
       </form>

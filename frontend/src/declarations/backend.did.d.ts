@@ -31,7 +31,7 @@ export interface T__1 {
   'id' : bigint,
   'minOrder' : bigint,
   'name' : string,
-  'pricePer1000' : bigint,
+  'pricePer1000' : number,
   'description' : string,
   'category' : Category,
   'maxOrder' : bigint,
@@ -47,19 +47,46 @@ export interface T__2 {
   'quantity' : bigint,
 }
 export type Time = bigint;
+export interface TopUpInitiation { 'redirectUrl' : string, 'amount' : bigint }
 export interface UserProfile { 'name' : string, 'email' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   /**
-   * / Add funds to a user's balance. Admin only.
+   * / Add funds to a user&apos;s balance. Admin only.
    */
   'addBalance' : ActorMethod<[Principal, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   /**
-   * / Get the caller's current balance. Requires user role.
+   * / Get the caller&apos;s current balance. Requires user role.
    */
   'getBalance' : ActorMethod<[], bigint>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -69,6 +96,7 @@ export interface _SERVICE {
    */
   'getOrderById' : ActorMethod<[bigint], T__2>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'initiateTopUp' : ActorMethod<[TopUpInitiation], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   /**
    * / List all orders for a given user. Only the user themselves or an admin can list orders.
@@ -84,9 +112,10 @@ export interface _SERVICE {
   'placeOrder' : ActorMethod<[NewOrderRequest], bigint>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   /**
-   * / Update an order's status. Admin only.
+   * / Update an order&apos;s status. Admin only.
    */
   'updateOrderStatus' : ActorMethod<[bigint, T], undefined>,
+  'updateServicePrice' : ActorMethod<[bigint, number], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

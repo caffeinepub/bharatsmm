@@ -27,10 +27,14 @@ export interface T__1 {
     id: bigint;
     minOrder: bigint;
     name: string;
-    pricePer1000: bigint;
+    pricePer1000: number;
     description: string;
     category: Category;
     maxOrder: bigint;
+}
+export interface TopUpInitiation {
+    redirectUrl: string;
+    amount: bigint;
 }
 export interface UserProfile {
     name: string;
@@ -59,12 +63,12 @@ export enum UserRole {
 }
 export interface backendInterface {
     /**
-     * / Add funds to a user's balance. Admin only.
+     * / Add funds to a user&apos;s balance. Admin only.
      */
     addBalance(user: Principal, amount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     /**
-     * / Get the caller's current balance. Requires user role.
+     * / Get the caller&apos;s current balance. Requires user role.
      */
     getBalance(): Promise<bigint>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -74,6 +78,7 @@ export interface backendInterface {
      */
     getOrderById(orderId: bigint): Promise<T__2>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    initiateTopUp(request: TopUpInitiation): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     /**
      * / List all orders for a given user. Only the user themselves or an admin can list orders.
@@ -89,7 +94,8 @@ export interface backendInterface {
     placeOrder(newOrder: NewOrderRequest): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     /**
-     * / Update an order's status. Admin only.
+     * / Update an order&apos;s status. Admin only.
      */
     updateOrderStatus(orderId: bigint, status: T): Promise<void>;
+    updateServicePrice(serviceId: bigint, newPrice: number): Promise<void>;
 }

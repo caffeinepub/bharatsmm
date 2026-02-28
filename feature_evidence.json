@@ -2,18 +2,20 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-build-a-multi-page-react-frontend-for-bharatsmm-with-the-following-pages-1-dashboard-account-balance-summary-recent-orders-count-quick-order-shortcut-2-new-order-service-category-selector-service-dropdown-with-price-min-max-info-link-input-quantity-input-order-total-calculator-submit-button-3-orders-paginated-table-of-past-orders-showing-id-service-name-link-quantity-status-badge-date-4-services-read-only-catalog-listing-all-available-services-grouped-by-category-with-pricing-5-add-funds-display-balance-and-a-form-to-request-a-top-up-amount-input-submit-6-profile-display-logged-in-user-principal",
-      "featureTitle": "Build a multi-page React frontend for BharatSMM with the following pages: (1) Dashboard — account balance summary, recent orders count, quick-order shortcut; (2) New Order — service category selector, service dropdown with price/min/max info, link input, quantity input, order total calculator, submit button; (3) Orders — paginated table of past orders showing ID, service name, link, quantity, status badge, date; (4) Services — read-only catalog listing all available services grouped by category with pricing; (5) Add Funds — display balance and a form to request a top-up (amount input, submit); (6) Profile — display logged-in user principal.",
+      "featureId": "feature-publish-and-deploy-the-complete-bharatsmm-application-all-frontend-pages-admin-dashboard-backend-actor-and-all-previously-implemented-features-as-the-live-production-version",
+      "featureTitle": "Publish and deploy the complete BharatSMM application (all frontend pages, admin dashboard, backend actor, and all previously implemented features) as the live production version.",
       "files": [
+        "frontend/index.html",
         "frontend/src/App.tsx",
-        "frontend/src/components/OrderStatusBadge.tsx",
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/index.css",
         "frontend/src/pages/AddFunds.tsx",
+        "frontend/src/pages/AdminDashboard.tsx",
         "frontend/src/pages/Dashboard.tsx",
         "frontend/src/pages/NewOrder.tsx",
         "frontend/src/pages/Orders.tsx",
         "frontend/src/pages/Profile.tsx",
-        "frontend/src/pages/Services.tsx",
-        "frontend/src/utils/orderCalculations.ts"
+        "frontend/src/pages/Services.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,31 +23,11 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-bold-professional-visual-theme-for-bharatsmm-dark-navy-charcoal-background-0f172a-1e293b-vibrant-orange-red-accent-f97316-ef4444-white-card-surfaces-with-subtle-shadows-clean-sans-serif-typography-and-a-sidebar-layout-with-the-bharatsmm-logo-name-at-the-top-use-consistent-badge-colors-for-order-statuses-and-ensure-all-interactive-elements-have-clear-hover-focus-states",
-      "featureTitle": "Apply a bold, professional visual theme for BharatSMM: dark navy/charcoal background (#0f172a / #1e293b), vibrant orange-red accent (#f97316 / #ef4444), white card surfaces with subtle shadows, clean sans-serif typography, and a sidebar layout with the BharatSMM logo/name at the top. Use consistent badge colors for order statuses and ensure all interactive elements have clear hover/focus states.",
-      "files": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-18"
       ],
       "confidence": "high"
     }

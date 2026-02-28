@@ -1,11 +1,10 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
-  "summary": "SMM (Social Media Marketing) panel app named 'bharatsmm'. User wants to publish with all changes from version 4 applied.",
+  "projectStateVersion": 11,
+  "summary": "SMM (Social Media Marketing) panel app named 'bharatsmm'. User wants an Admin Dashboard with admin access to approve pending top-up requests and manage orders.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Bold shield or rocket icon with the letters 'B' and 'SMM' in a modern style, orange-red gradient on dark navy background (bharatsmm-logo.dim_256x256.png)",
   "existing_features": [
     {
       "id": "feature-build-a-multi-page-react-frontend-for-bharatsmm-with-the-following-pages-1-dashboard-account-balance-summary-recent-orders-count-quick-order-shortcut-2-new-order-service-category-selector-service-dropdown-with-price-min-max-info-link-input-quantity-input-order-total-calculator-submit-button-3-orders-paginated-table-of-past-orders-showing-id-service-name-link-quantity-status-badge-date-4-services-read-only-catalog-listing-all-available-services-grouped-by-category-with-pricing-5-add-funds-display-balance-and-a-form-to-request-a-top-up-amount-input-submit-6-profile-display-logged-in-user-principal",
@@ -20,6 +19,86 @@
       "title": "Apply a bold, professional visual theme for BharatSMM: dark navy/charcoal background (#0f172a / #1e293b), vibrant orange-red accent (#f97316 / #ef4444), white card surfaces with subtle shadows, clean sans-serif typography, and a sidebar layout with the BharatSMM logo/name at the top. Use consistent badge colors for order statuses and ensure all interactive elements have clear hover/focus states.",
       "reqIds": [
         "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-tanstack-query-hooks-for-all-new-admin-backend-functions-useisadmin-usegetalltopuprequests-useapprovetopuprequest-userejecttopuprequest-usegetallorders-admin-view-and-useupdateorderstatus-these-should-follow-the-same-pattern-as-existing-hooks-in-frontend-src-hooks-usequeries-ts",
+      "title": "Add a TanStack Query hooks for all new admin backend functions: `useIsAdmin`, `useGetAllTopUpRequests`, `useApproveTopUpRequest`, `useRejectTopUpRequest`, `useGetAllOrders` (admin view), and `useUpdateOrderStatus`. These should follow the same pattern as existing hooks in `frontend/src/hooks/useQueries.ts`.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-an-admin-dashboard-page-at-route-admin-gate-access-so-only-the-admin-principal-can-view-it-non-admins-see-an-access-denied-message-the-page-must-contain-two-tabs-or-sections-1-top-up-requests-a-table-listing-all-pending-top-up-requests-with-columns-user-principal-requested-amount-inr-date-status-badge-and-approve-reject-action-buttons-2-order-management-a-table-of-all-user-orders-across-the-platform-with-columns-order-id-user-principal-service-name-link-quantity-status-badge-date-and-a-dropdown-or-button-to-update-the-order-status-pending-processing-completed-canceled-failed-refunded-apply-the-existing-bharatsmm-dark-navy-orange-red-theme-consistently",
+      "title": "Create an Admin Dashboard page at route `/admin`. Gate access so only the admin principal can view it — non-admins see an 'Access Denied' message. The page must contain two tabs or sections: (1) Top-Up Requests — a table listing all pending top-up requests with columns: user principal, requested amount (INR), date, status badge, and Approve/Reject action buttons; (2) Order Management — a table of all user orders across the platform with columns: order ID, user principal, service name, link, quantity, status badge, date, and a dropdown or button to update the order status (pending, processing, completed, canceled, failed, refunded). Apply the existing BharatSMM dark navy/orange-red theme consistently.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-admin-navigation-link-in-the-sidebar-frontend-src-components-layout-tsx-that-is-visible-only-when-the-current-user-is-the-admin-the-link-should-navigate-to-admin",
+      "title": "Add an 'Admin' navigation link in the sidebar (`frontend/src/components/Layout.tsx`) that is visible only when the current user is the admin. The link should navigate to `/admin`.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-register-the-admin-route-in-frontend-src-app-tsx-alongside-existing-routes-pointing-to-the-new-admindashboard-page-component",
+      "title": "Register the `/admin` route in `frontend/src/App.tsx` alongside existing routes, pointing to the new AdminDashboard page component.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-add-funds-page-frontend-src-pages-addfunds-tsx-to-set-the-minimum-deposit-amount-to-1-all-validation-logic-input-constraints-and-preset-amount-buttons-must-allow-values-as-low-as-1-enabling-users-to-submit-top-up-requests-for-small-amounts-like-5-or-10",
+      "title": "Update the Add Funds page (`frontend/src/pages/AddFunds.tsx`) to set the minimum deposit amount to ₹1. All validation logic, input constraints, and preset amount buttons must allow values as low as ₹1, enabling users to submit top-up requests for small amounts like ₹5 or ₹10.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-the-generated-bharatsmm-payment-qr-code-image-frontend-public-assets-generated-bharatsmm-payment-qr-dim-400x400-png-prominently-on-the-add-funds-page-frontend-src-pages-addfunds-tsx-place-it-in-a-clearly-labeled-scan-pay-section-above-or-alongside-the-top-up-form-with-instructional-text-telling-users-to-scan-the-qr-code-to-pay-any-amount-via-upi-and-then-submit-the-top-up-request-form",
+      "title": "Display the generated BharatSMM payment QR code image (`frontend/public/assets/generated/bharatsmm-payment-qr.dim_400x400.png`) prominently on the Add Funds page (`frontend/src/pages/AddFunds.tsx`). Place it in a clearly labeled 'Scan & Pay' section above or alongside the top-up form, with instructional text telling users to scan the QR code to pay any amount via UPI and then submit the top-up request form.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-tanstack-query-mutation-hook-useupdateserviceprice-in-frontend-src-hooks-usequeries-ts-that-calls-the-backend-updateserviceprice-function-and-invalidates-the-services-query-on-success-follow-the-same-pattern-as-existing-mutation-hooks-in-that-file",
+      "title": "Add a TanStack Query mutation hook `useUpdateServicePrice` in `frontend/src/hooks/useQueries.ts` that calls the backend `updateServicePrice` function and invalidates the services query on success. Follow the same pattern as existing mutation hooks in that file.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-service-prices-section-or-tab-to-the-existing-admin-dashboard-page-frontend-src-pages-admindashboard-tsx-that-lists-all-services-with-their-current-price-per-1000-and-an-inline-editable-price-field-plus-a-save-button-per-row-on-save-call-useupdateserviceprice-and-show-a-success-or-error-toast-apply-the-existing-bharatsmm-dark-navy-orange-red-theme-consistently",
+      "title": "Add a 'Service Prices' section (or tab) to the existing Admin Dashboard page (`frontend/src/pages/AdminDashboard.tsx`) that lists all services with their current price-per-1000 and an inline editable price field plus a 'Save' button per row. On save, call `useUpdateServicePrice` and show a success or error toast. Apply the existing BharatSMM dark navy/orange-red theme consistently.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-sidebar-frontend-src-components-layout-tsx-rename-the-existing-admin-navigation-entry-label-to-admin-panel-if-it-currently-reads-admin-so-it-matches-the-user-facing-label-requested-the-link-must-remain-visible-only-to-the-logged-in-admin-principal-and-navigate-to-admin",
+      "title": "In the sidebar (`frontend/src/components/Layout.tsx`), rename the existing admin navigation entry label to 'Admin Panel' (if it currently reads 'Admin') so it matches the user-facing label requested. The link must remain visible only to the logged-in admin principal and navigate to `/admin`.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-publish-and-deploy-the-complete-bharatsmm-application-all-frontend-pages-admin-dashboard-backend-actor-and-all-previously-implemented-features-as-the-live-production-version",
+      "title": "Publish and deploy the complete BharatSMM application (all frontend pages, admin dashboard, backend actor, and all previously implemented features) as the live production version.",
+      "reqIds": [
+        "REQ-18"
       ],
       "version": 1
     }
@@ -52,6 +131,54 @@
       "summary": "Generate and render a BharatSMM logo mark as a static asset (frontend/public/assets/generated/bharatsmm-logo.dim_256x256.png) and display it in the sidebar header.",
       "reqIds": [
         "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add an Admin Dashboard accessible to the owner/admin, with ability to approve/reject pending top-up (add funds) requests and manage all user orders (view, update status, cancel, etc.).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add an admin role to the backend. Store a hardcoded admin principal (set to the caller's principal on first admin registration, or configurable at deploy time). Expose backend functions: `isAdmin(caller) → Bool`, `getAllTopUpRequests() → [TopUpRequest]` (admin-only), `approveTopUpRequest(requestId) → Result` (admin-only, credits the user's balance), `rejectTopUpRequest(requestId) → Result` (admin-only), `getAllOrders() → [SmmOrder]` (admin-only), and `updateOrderStatus(orderId, newStatus) → Result` (admin-only). Top-up requests submitted via AddFunds must persist as pending records with fields: id, userId, amount, status (pending/approved/rejected), createdAt.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Update Add Funds logic: set minimum deposit amount to ₹1 to allow small deposits like ₹5 or ₹10.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add a Payment QR code image to the Add Funds/payment page so users can scan and pay any amount. Allow users to upload a payment screenshot after scanning.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Also update the backend (`backend/main.mo`) top-up request validation to accept amounts as low as 1 (₹1). Remove or lower any backend-side minimum amount guard that would reject small deposit amounts.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add ability for admin to change/update service prices instantly from the Admin Panel.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add a backend Motoko function `updateServicePrice(serviceId: Nat, newPrice: Float) → Result` (admin-only) that allows the admin to instantly update the price-per-1000 of any service in the services catalog. The function must reject calls from non-admin principals.",
+      "reqIds": [
+        "REQ-14"
       ],
       "status": "pending"
     }

@@ -1,17 +1,22 @@
 import Array "mo:core/Array";
-import Iter "mo:core/Iter";
+import Float "mo:core/Float";
 import Int "mo:core/Int";
+import Iter "mo:core/Iter";
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Order "mo:core/Order";
-import Time "mo:core/Time";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import Text "mo:core/Text";
+import Time "mo:core/Time";
 import MixinAuthorization "authorization/MixinAuthorization";
+import MixinStorage "blob-storage/Mixin";
+import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 
 actor {
+  include MixinStorage();
+
   module Service {
     public type Category = {
       #instagram;
@@ -26,7 +31,7 @@ actor {
       id : Nat;
       name : Text;
       category : Category;
-      pricePer1000 : Nat;
+      pricePer1000 : Float;
       minOrder : Nat;
       maxOrder : Nat;
       description : Text;
@@ -65,6 +70,13 @@ actor {
     };
   };
 
+  // Shim to fill gap between core library and Nat library.
+  module Float {
+    public func toNat(x : Float) : Nat {
+      (x.toInt()).toNat();
+    };
+  };
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -86,7 +98,7 @@ actor {
         id = 1;
         name = "Instagram Followers";
         category = #instagram;
-        pricePer1000 = 1500;
+        pricePer1000 = 1.5;
         minOrder = 10;
         maxOrder = 10000;
         description = "High quality followers with gradual delivery.";
@@ -95,7 +107,7 @@ actor {
         id = 2;
         name = "Instagram Likes";
         category = #instagram;
-        pricePer1000 = 1200;
+        pricePer1000 = 1.2;
         minOrder = 20;
         maxOrder = 15000;
         description = "Instant likes for your photos and videos.";
@@ -104,7 +116,7 @@ actor {
         id = 3;
         name = "Instagram Views";
         category = #instagram;
-        pricePer1000 = 1000;
+        pricePer1000 = 1.0;
         minOrder = 50;
         maxOrder = 20000;
         description = "Genuine views from active users.";
@@ -113,7 +125,7 @@ actor {
         id = 4;
         name = "Instagram Comments";
         category = #instagram;
-        pricePer1000 = 2500;
+        pricePer1000 = 2.5;
         minOrder = 30;
         maxOrder = 5000;
         description = "Real comments to boost engagement.";
@@ -122,7 +134,7 @@ actor {
         id = 5;
         name = "YouTube Subscribers";
         category = #youtube;
-        pricePer1000 = 3500;
+        pricePer1000 = 3.5;
         minOrder = 15;
         maxOrder = 8000;
         description = "Organic subscribers with no drop guarantee.";
@@ -131,7 +143,7 @@ actor {
         id = 6;
         name = "YouTube Views";
         category = #youtube;
-        pricePer1000 = 1800;
+        pricePer1000 = 1.8;
         minOrder = 100;
         maxOrder = 40000;
         description = "High retention views from global users.";
@@ -140,7 +152,7 @@ actor {
         id = 7;
         name = "YouTube Likes";
         category = #youtube;
-        pricePer1000 = 1600;
+        pricePer1000 = 1.6;
         minOrder = 25;
         maxOrder = 12000;
         description = "Fast likes to your videos.";
@@ -149,7 +161,7 @@ actor {
         id = 8;
         name = "Twitter/X Followers";
         category = #twitterX;
-        pricePer1000 = 2000;
+        pricePer1000 = 2.0;
         minOrder = 10;
         maxOrder = 7000;
         description = "Worldwide followers with steady delivery.";
@@ -158,7 +170,7 @@ actor {
         id = 9;
         name = "Twitter/X Retweets";
         category = #twitterX;
-        pricePer1000 = 1400;
+        pricePer1000 = 1.4;
         minOrder = 10;
         maxOrder = 8000;
         description = "Boost the reach of your tweets.";
@@ -167,7 +179,7 @@ actor {
         id = 10;
         name = "Twitter/X Likes";
         category = #twitterX;
-        pricePer1000 = 1100;
+        pricePer1000 = 1.1;
         minOrder = 20;
         maxOrder = 9000;
         description = "Instant likes from active accounts.";
@@ -176,7 +188,7 @@ actor {
         id = 11;
         name = "TikTok Followers";
         category = #tiktok;
-        pricePer1000 = 2200;
+        pricePer1000 = 2.2;
         minOrder = 15;
         maxOrder = 15000;
         description = "Authentic followers with gradual delivery.";
@@ -185,7 +197,7 @@ actor {
         id = 12;
         name = "TikTok Likes";
         category = #tiktok;
-        pricePer1000 = 900;
+        pricePer1000 = 0.9;
         minOrder = 30;
         maxOrder = 10000;
         description = "Fast and organic likes for your videos.";
@@ -194,7 +206,7 @@ actor {
         id = 13;
         name = "TikTok Views";
         category = #tiktok;
-        pricePer1000 = 800;
+        pricePer1000 = 0.8;
         minOrder = 60;
         maxOrder = 22000;
         description = "Worldwide exposure for your content.";
@@ -203,7 +215,7 @@ actor {
         id = 14;
         name = "Facebook Page Likes";
         category = #facebook;
-        pricePer1000 = 2500;
+        pricePer1000 = 2.5;
         minOrder = 10;
         maxOrder = 5000;
         description = "Real page likes from active users.";
@@ -212,16 +224,16 @@ actor {
         id = 15;
         name = "Telegram Channel Members";
         category = #telegram;
-        pricePer1000 = 1800;
+        pricePer1000 = 1.8;
         minOrder = 20;
         maxOrder = 12000;
-        description = "Increase your channel's reach.";
+        description = "Increase your channel&apos;s reach.";
       },
       {
         id = 16;
         name = "Facebook Post Likes";
         category = #facebook;
-        pricePer1000 = 1300;
+        pricePer1000 = 1.3;
         minOrder = 20;
         maxOrder = 8000;
         description = "Boost engagement on your Facebook posts.";
@@ -230,7 +242,7 @@ actor {
         id = 17;
         name = "Telegram Post Views";
         category = #telegram;
-        pricePer1000 = 700;
+        pricePer1000 = 0.7;
         minOrder = 50;
         maxOrder = 30000;
         description = "Increase visibility of your Telegram posts.";
@@ -273,6 +285,29 @@ actor {
     services.values().toArray().sort();
   };
 
+  public shared ({ caller }) func updateServicePrice(serviceId : Nat, newPrice : Float) : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Only admins can update service prices");
+    };
+
+    let service = switch (services.get(serviceId)) {
+      case (null) { Runtime.trap("Service not found") };
+      case (?svc) { svc };
+    };
+
+    let updatedService = {
+      id = service.id;
+      name = service.name;
+      category = service.category;
+      pricePer1000 = newPrice;
+      minOrder = service.minOrder;
+      maxOrder = service.maxOrder;
+      description = service.description;
+    };
+
+    services.add(serviceId, updatedService);
+  };
+
   // ── Order Functions ─────────────────────────────────────────────────────────
 
   public type NewOrderRequest = {
@@ -303,7 +338,7 @@ actor {
       case (?bal) { bal };
     };
 
-    let totalCost = (newOrder.quantity * service.pricePer1000) / 1000;
+    let totalCost = Float.toNat((newOrder.quantity.toFloat() * service.pricePer1000) / 1000.0);
 
     if (currentBalance < totalCost) {
       Runtime.trap("Insufficient balance. Top up your account.");
@@ -362,7 +397,7 @@ actor {
 
   // ── Balance Functions ───────────────────────────────────────────────────────
 
-  /// Get the caller's current balance. Requires user role.
+  /// Get the caller&apos;s current balance. Requires user role.
   public query ({ caller }) func getBalance() : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can check their balance");
@@ -373,7 +408,7 @@ actor {
     };
   };
 
-  /// Add funds to a user's balance. Admin only.
+  /// Add funds to a user&apos;s balance. Admin only.
   public shared ({ caller }) func addBalance(user : Principal, amount : Nat) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can add balance");
@@ -385,7 +420,7 @@ actor {
     balances.add(user, current + amount);
   };
 
-  /// Update an order's status. Admin only.
+  /// Update an order&apos;s status. Admin only.
   public shared ({ caller }) func updateOrderStatus(orderId : Nat, status : OrderStatus.T) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can update order status");
@@ -405,5 +440,21 @@ actor {
       createdAt = order.createdAt;
     };
     orders.add(orderId, updated);
+  };
+
+  // ── Top-up Functions ────────────────────────────────────────────────────────
+
+  public type TopUpInitiation = {
+    amount : Nat;
+    redirectUrl : Text;
+  };
+
+  public shared ({ caller }) func initiateTopUp(request : TopUpInitiation) : async () {
+    if (request.amount == 0) {
+      Runtime.trap("Amount must be greater than zero");
+    };
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can top up");
+    };
   };
 };

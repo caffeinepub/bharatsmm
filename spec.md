@@ -1,15 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Build BharatSMM, a full Social Media Marketing (SMM) panel with a Motoko backend and a multi-page React frontend.
+**Goal:** Deploy the complete BharatSMM application as the live production version with all existing features intact.
 
 **Planned changes:**
-- Create a single Motoko actor (`backend/main.mo`) managing a services catalog, user orders, and user balances with query/update functions for listing services, placing orders, checking order status, and topping up balance.
-- Seed the backend with at least 15 SMM services across Instagram, YouTube, Twitter/X, Facebook, TikTok, and Telegram categories (each with name, category, price per 1000, min/max order quantity).
-- Build a React frontend with a persistent sidebar layout and pages: Dashboard (balance summary, recent orders, quick-order shortcut), New Order (category selector, service dropdown, link input, quantity input, real-time total calculator, submit), Orders (paginated table with colored status badges), Services (read-only catalog grouped by category), Add Funds (balance display + top-up form), and Profile (shows user principal).
-- Apply a dark navy/charcoal global theme (`#0f172a` / `#1e293b`) with orange-red accents (`#f97316` / `#ef4444`), white card surfaces, clean sans-serif typography, and consistent status badge colors (Pending = yellow, Processing = blue, Completed = green, Cancelled = red).
-- Display the BharatSMM logo in the sidebar header loaded from the static assets path.
-- Fetch all data from the backend canister via React Query hooks; all forms show loading and error states.
-- Sidebar is persistent on desktop and collapsible on mobile.
+- Publish all frontend pages (Dashboard, New Order, Orders, Services, Add Funds, Profile, Admin Panel) to production
+- Deploy the backend actor with all implemented functions (orders, balances, top-up requests, admin operations)
+- Ensure the Admin Panel is accessible only to the admin principal
+- Verify the dark navy/orange-red visual theme is consistently applied across all pages
+- Confirm the sidebar renders the BharatSMM logo and all navigation links including the conditional Admin Panel entry
+- Confirm the Add Funds page displays the UPI QR code and accepts deposits as low as ₹1
+- Confirm service price editing works from the Admin Panel's Service Prices tab
 
-**User-visible outcome:** Users can visit the BharatSMM panel, browse available SMM services, place orders, track order status, add funds to their balance, and view their profile — all within a polished dark-themed dashboard.
+**User-visible outcome:** The BharatSMM app is live and accessible at its production URL, with all pages and backend functionality fully operational.

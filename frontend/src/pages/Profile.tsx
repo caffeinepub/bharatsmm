@@ -1,213 +1,149 @@
-import React, { useState } from 'react';
-import { User, Mail, Shield, Copy, Check, AlertCircle, Edit2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Loader2, Copy, Check, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Profile() {
   const { identity } = useInternetIdentity();
-  const { data: profile, isLoading, isFetched } = useGetCallerUserProfile();
-  const saveProfile = useSaveCallerUserProfile();
+  const { data: userProfile, isLoading } = useGetCallerUserProfile();
+  const { mutateAsync: saveProfile, isPending } = useSaveCallerUserProfile();
 
-  const [editing, setEditing] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    if (userProfile) {
+      setName(userProfile.name);
+      setEmail(userProfile.email);
+    }
+  }, [userProfile]);
+
   const principalId = identity?.getPrincipal().toString() ?? '';
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(principalId);
+  const handleCopy = async () => {
+    if (!principalId) return;
+    await navigator.clipboard.writeText(principalId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast.success('Principal ID copied!');
   };
 
-  const handleEdit = () => {
-    setName(profile?.name ?? '');
-    setEmail(profile?.email ?? '');
-    setEditing(true);
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    await saveProfile.mutateAsync({ name: name.trim(), email: email.trim() });
-    setEditing(false);
+    if (!name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    try {
+      await saveProfile({ name: name.trim(), email: email.trim() });
+      toast.success('Profile updated successfully!');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update profile');
+    }
   };
 
-  if (!identity) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-8">
-        <div className="w-16 h-16 rounded-2xl brand-gradient flex items-center justify-center">
-          <AlertCircle className="w-8 h-8 text-white" />
-        </div>
-        <h2 className="font-display text-2xl font-bold text-foreground">Login Required</h2>
-        <p className="text-muted-foreground text-center max-w-sm">
-          Please log in to view your profile.
-        </p>
+      <div className="flex items-center justify-center py-24">
+        <Loader2 size={28} className="animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-lg mx-auto space-y-6 animate-fade-in">
+    <div className="p-6 max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-foreground">Profile</h1>
+        <h1 className="text-2xl font-bold font-display text-foreground">Profile</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Manage your BharatSMM account details.
+          Manage your account information.
         </p>
       </div>
 
-      {/* Avatar & Name */}
-      <Card className="bg-card border-border">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl brand-gradient flex items-center justify-center flex-shrink-0">
-              <User className="w-8 h-8 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              {isLoading ? (
-                <>
-                  <Skeleton className="h-6 w-32 bg-muted mb-2" />
-                  <Skeleton className="h-4 w-48 bg-muted" />
-                </>
-              ) : profile ? (
-                <>
-                  <h2 className="font-display font-bold text-xl text-foreground">{profile.name}</h2>
-                  {profile.email && (
-                    <p className="text-muted-foreground text-sm flex items-center gap-1.5 mt-0.5">
-                      <Mail className="w-3.5 h-3.5" />
-                      {profile.email}
-                    </p>
-                  )}
-                </>
-              ) : (
-                <p className="text-muted-foreground text-sm">No profile set up yet</p>
-              )}
-            </div>
-            {isFetched && profile && !editing && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEdit}
-                className="border-border text-muted-foreground hover:text-foreground flex-shrink-0"
-              >
-                <Edit2 className="w-3.5 h-3.5 mr-1.5" />
-                Edit
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Avatar */}
+      <div className="glass-card rounded-xl p-6 border border-border/30 flex items-center gap-5">
+        <div className="w-16 h-16 rounded-2xl bg-brand/20 flex items-center justify-center flex-shrink-0">
+          <User size={28} className="text-brand" />
+        </div>
+        <div>
+          <p className="text-lg font-bold text-foreground">{userProfile?.name || 'User'}</p>
+          <p className="text-sm text-muted-foreground">{userProfile?.email || 'No email set'}</p>
+        </div>
+      </div>
 
-      {/* Edit / Setup Form */}
-      {(editing || (isFetched && !profile && !isLoading)) && (
-        <Card className="bg-card border-border">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base font-semibold text-foreground">
-              {profile ? 'Edit Profile' : 'Set Up Profile'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="profile-name" className="text-foreground text-sm">
-                  Full Name <span className="text-brand">*</span>
-                </Label>
-                <Input
-                  id="profile-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="bg-background border-border text-foreground"
-                  required
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="profile-email" className="text-foreground text-sm">
-                  Email Address
-                </Label>
-                <Input
-                  id="profile-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="bg-background border-border text-foreground"
-                />
-              </div>
+      {/* Edit Form */}
+      <form onSubmit={handleSubmit} className="glass-card rounded-xl p-6 border border-border/30 space-y-5">
+        <h2 className="text-lg font-semibold font-display text-foreground">Edit Profile</h2>
 
-              {saveProfile.isError && (
-                <p className="text-sm text-destructive">
-                  {saveProfile.error?.message ?? 'Failed to save profile.'}
-                </p>
-              )}
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-foreground font-medium">
+            Name <span className="text-brand">*</span>
+          </Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your full name"
+            className="bg-background border-border/50 focus:border-brand"
+            required
+          />
+        </div>
 
-              <div className="flex gap-3">
-                <Button
-                  type="submit"
-                  disabled={saveProfile.isPending || !name.trim()}
-                  className="flex-1 brand-gradient text-white hover:opacity-90 font-semibold"
-                >
-                  {saveProfile.isPending ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                      Saving...
-                    </span>
-                  ) : (
-                    'Save Profile'
-                  )}
-                </Button>
-                {editing && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEditing(false)}
-                    className="border-border text-muted-foreground hover:text-foreground"
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-foreground font-medium">
+            Email
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="bg-background border-border/50 focus:border-brand"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isPending || !name.trim()}
+          className="bg-brand hover:bg-brand/90 text-white font-semibold"
+        >
+          {isPending ? (
+            <>
+              <Loader2 size={16} className="mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Changes'
+          )}
+        </Button>
+      </form>
 
       {/* Principal ID */}
-      <Card className="bg-card border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-display text-sm font-semibold text-foreground flex items-center gap-2">
-            <Shield className="w-4 h-4 text-brand" />
-            Principal ID
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-background border border-border">
-            <code className="text-xs text-muted-foreground font-mono flex-1 break-all">
-              {principalId}
-            </code>
-            <button
-              onClick={handleCopy}
-              className="flex-shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              title="Copy principal ID"
-            >
-              {copied ? (
-                <Check className="w-4 h-4 text-green-400" />
-              ) : (
-                <Copy className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            This is your unique identity on the Internet Computer blockchain.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="glass-card rounded-xl p-6 border border-border/30 space-y-3">
+        <h2 className="text-lg font-semibold font-display text-foreground">Internet Identity</h2>
+        <p className="text-sm text-muted-foreground">Your unique principal ID on the Internet Computer.</p>
+        <div className="flex items-center gap-2">
+          <code className="flex-1 text-xs bg-background border border-border/50 rounded-lg px-3 py-2.5 text-muted-foreground font-mono break-all">
+            {principalId || 'Not available'}
+          </code>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleCopy}
+            disabled={!principalId}
+            className="flex-shrink-0 border-border/50 hover:border-brand/50"
+          >
+            {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
