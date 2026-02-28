@@ -1,0 +1,18 @@
+{
+  "frontend/src/index.css": "Global styles with dark navy/charcoal OKLCH color system, Inter and Space Grotesk fonts, brand orange-red gradient utilities, and glass card effects for the BharatSMM dark theme.",
+  "frontend/tailwind.config.js": "Extended Tailwind config with BharatSMM brand colors (navy palette, orange-red brand), Space Grotesk/Inter font families, brand shadow, and fade-in animation.",
+  "frontend/src/hooks/useQueries.ts": "All React Query hooks for the BharatSMM backend: useServices, useBalance, useOrdersByUser, usePlaceOrder, useGetCallerUserProfile, and useSaveCallerUserProfile with proper cache invalidation.",
+  "frontend/src/utils/orderCalculations.ts": "Utility functions for calculating order totals, formatting currency in INR, and formatting bigint balance values for display.",
+  "frontend/src/components/OrderStatusBadge.tsx": "Reusable colored badge component mapping order status enum values (pending/processing/completed/canceled/failed/refunded) to styled pill badges.",
+  "frontend/src/components/Layout.tsx": "Persistent sidebar layout with BharatSMM logo, navigation links to all pages, mobile hamburger menu with overlay, and login/logout button with principal display.",
+  "frontend/src/components/ProfileSetupModal.tsx": "Modal dialog for first-time profile setup after login, collecting name and email via a form with loading and error states.",
+  "frontend/src/pages/Dashboard.tsx": "Dashboard page showing account balance, order stats (total/in-progress/completed), quick action cards, and a recent orders list with auth guard.",
+  "frontend/src/pages/NewOrder.tsx": "New Order page with category filter, service dropdown showing price/min/max info, link and quantity inputs, real-time order total calculator, and order submission with loading/error states.",
+  "frontend/src/pages/Orders.tsx": "Orders page with searchable, paginated table showing order ID, service name, link, quantity, cost, colored status badge, and date with auth guard.",
+  "frontend/src/pages/Services.tsx": "Public services catalog page with category filter buttons, search, and grouped service cards showing name, description, price/1000, min/max order.",
+  "frontend/src/pages/AddFunds.tsx": "Add Funds page showing current balance, preset amount buttons, a top-up request form, and an info banner explaining the admin-approval process.",
+  "frontend/src/pages/Profile.tsx": "Profile page displaying user avatar, name, email, editable profile form, and copyable principal ID with auth guard.",
+  "frontend/src/pages/LoginPage.tsx": "Full-screen login landing page with BharatSMM branding, feature highlights, and Internet Identity login button.",
+  "frontend/src/App.tsx": "Main app with TanStack Router setup, auth-gated root layout that shows LoginPage for unauthenticated users, Layout+Outlet for authenticated users, and ProfileSetupModal for new users.",
+  "frontend/index.html": "HTML entry point with updated title and meta description for BharatSMM."
+}

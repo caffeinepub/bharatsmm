@@ -1,0 +1,109 @@
+{
+  "kind": "build_request",
+  "title": "BharatSMM Panel — Full SMM Dashboard",
+  "projectName": "BharatSMM",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a Motoko backend actor that stores and manages SMM panel data: services catalog (id, name, category, price per 1000, min order, max order, description), user orders (id, userId, serviceId, link, quantity, status, createdAt), and user balances. Expose public query and update functions for listing services, placing orders, checking order status, and managing user balance.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "publish my SMM panel with the name bharatsmm"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Services can be listed and filtered by category.",
+        "Users can place a new order by providing serviceId, link, and quantity.",
+        "Order status transitions: Pending → Processing → Completed / Cancelled.",
+        "User balance can be queried and topped up."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Build a multi-page React frontend for BharatSMM with the following pages: (1) Dashboard — account balance summary, recent orders count, quick-order shortcut; (2) New Order — service category selector, service dropdown with price/min/max info, link input, quantity input, order total calculator, submit button; (3) Orders — paginated table of past orders showing ID, service name, link, quantity, status badge, date; (4) Services — read-only catalog listing all available services grouped by category with pricing; (5) Add Funds — display balance and a form to request a top-up (amount input, submit); (6) Profile — display logged-in user principal.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "publish my SMM panel"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Navigation sidebar or top nav links to all pages.",
+        "New Order page computes and displays the order total in real time as quantity changes.",
+        "Orders page shows a colored status badge (Pending = yellow, Processing = blue, Completed = green, Cancelled = red).",
+        "All data is fetched from the backend canister via React Query hooks.",
+        "Forms show loading and error states."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Seed the backend with a realistic set of at least 15 SMM services across categories including Instagram, YouTube, Twitter/X, Facebook, TikTok, and Telegram. Each service must have a name, category, price per 1000, minimum order, and maximum order quantity.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ]
+      },
+      "acceptanceCriteria": [
+        "At least 15 services are available on first deploy.",
+        "Each service belongs to one of the listed categories.",
+        "Services are returned correctly by the list-services query."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Apply a bold, professional visual theme for BharatSMM: dark navy/charcoal background (#0f172a / #1e293b), vibrant orange-red accent (#f97316 / #ef4444), white card surfaces with subtle shadows, clean sans-serif typography, and a sidebar layout with the BharatSMM logo/name at the top. Use consistent badge colors for order statuses and ensure all interactive elements have clear hover/focus states.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dark background is applied globally.",
+        "Accent color is used on buttons, active nav items, and highlighted figures.",
+        "Sidebar is persistent on desktop and collapsible on mobile.",
+        "Typography is clean and readable on dark backgrounds."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Generate and render a BharatSMM logo mark as a static asset (frontend/public/assets/generated/bharatsmm-logo.dim_256x256.png) and display it in the sidebar header.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logo image is displayed in the sidebar at an appropriate size.",
+        "Image is loaded from the static assets path."
+      ]
+    }
+  ],
+  "constraints": [
+    "App name must be displayed as 'BharatSMM' throughout the UI.",
+    "All backend logic must reside in a single Motoko actor (backend/main.mo).",
+    "Do not integrate any external payment gateway or third-party API."
+  ],
+  "nonGoals": [
+    "Real payment processing or wallet integration.",
+    "Actual order fulfillment or third-party SMM API calls.",
+    "Admin panel or role-based access control beyond basic user identity.",
+    "Real-time order status updates via WebSockets."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Bold shield or rocket icon with the letters 'B' and 'SMM' in a modern style, orange-red gradient on dark navy background (bharatsmm-logo.dim_256x256.png)"
+    ],
+    "edits": []
+  }
+}
